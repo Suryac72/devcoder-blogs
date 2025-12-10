@@ -94,24 +94,8 @@ const config: Config = {
           items: [
             {
               label: 'Java',
-              to: '/docs/java-for-interviews/multithreading',
-            },
-            {
-              label: 'JavaScript & TypeScript',
-              to: '/docs/intro',
-            },
-            {
-              label: 'React',
-              to: '/docs/intro',
-            },
-            {
-              label: 'Data Structures & Algorithms',
-              to: '/docs/data-structures/arrays-lists',
-            },
-            {
-              label: 'System Design',
-              to: '/docs/intro',
-            },
+              to: '/docs/java-for-interviews/multi-threading',
+            }
           ],
         },
         {to: '/blog', label: 'Blog', position: 'left'},
@@ -131,23 +115,7 @@ const config: Config = {
             {
               label: 'Java',
               to: '/docs/intro',
-            },
-            {
-              label: 'JavaScript & TypeScript',
-              to: '/docs/intro',
-            },
-            {
-              label: 'React',
-              to: '/docs/intro',
-            },
-            {
-              label: 'Data Structures & Algorithms',
-              to: '/docs/intro',
-            },
-            {
-              label: 'System Design',
-              to: '/docs/intro',
-            },
+            }
           ],
         },
         {

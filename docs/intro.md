@@ -85,10 +85,9 @@ Found a typo or want to improve the content? We welcome contributions! Visit our
 
 ## Quick Links
 
-- ☕ [Java Concepts](./java-for-interviews/multithreading)
+- ☕ [Java Concepts](./java-for-interviews/multi-threading)
 - ⚛️ [React Guide](./intro)
 - 📜 [JavaScript & TypeScript](./intro)
-- 📊 [Data Structures](./data-structures/arrays-lists)
 - 🏗️ [System Design](./intro)
 - ✍️ [Read Blog Articles](/blog)
 - 📋 [Quick Reference](./quick-reference)
