@@ -23,7 +23,7 @@ The Adapter Pattern converts one interface into another that clients expect, all
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Existing interface (Adaptee)
 class LegacyPaymentProcessor {
     public boolean processPayment(double amount) {
@@ -104,7 +104,7 @@ Decouples an abstraction from its implementation so they can vary independently.
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Implementor (separate from shape)
 interface Color {
     String getColor();
@@ -197,7 +197,7 @@ Composes objects into tree structures to represent part-whole hierarchies, allow
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Component interface
 interface FileSystemComponent {
     void display(int depth);
@@ -294,7 +294,7 @@ Attaches additional responsibilities to an object dynamically, providing a flexi
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Component interface
 interface Coffee {
     double getCost();
@@ -385,7 +385,7 @@ Provides a unified, simplified interface to a complex subsystem.
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Complex subsystem classes
 class Lights {
     public void on() { System.out.println("Lights on"); }
@@ -468,7 +468,7 @@ Uses sharing to support large numbers of objects efficiently by sharing common s
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Flyweight
 class Character {
     private char symbol;
@@ -550,7 +550,7 @@ Provides a surrogate or placeholder that controls access to the real object.
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Subject interface
 interface DataService {
     String fetchData(String id);

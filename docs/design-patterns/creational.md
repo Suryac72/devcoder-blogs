@@ -32,7 +32,7 @@ The Singleton Pattern ensures that a class has only one instance and provides a 
 
 ### 💡 Code Example
 
-```java
+```typescript
 // Bill Pugh Singleton (Most recommended)
 public class DatabaseConnection {
     private DatabaseConnection() {}
@@ -99,7 +99,7 @@ The Factory Pattern provides an interface for creating objects, but lets subclas
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Product interface
 interface Database {
     void connect();
@@ -176,7 +176,7 @@ The Abstract Factory Pattern provides an interface for creating families of rela
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Abstract products
 interface Button { void paint(); }
 interface Checkbox { void paint(); }
@@ -240,7 +240,7 @@ class MacFactory implements GUIFactory {
 ### 🎯 Problem
 You need to create complex objects with many optional parameters. Using constructors with many parameters becomes unreadable and error-prone (constructor telescoping).
 
-```java
+```typescript
 // ❌ Bad: Constructor telescoping
 new Pizza(dough, sauce, cheese, pepperoni, mushrooms, olives, corn);
 ```
@@ -257,7 +257,7 @@ The Builder Pattern provides a way to construct complex objects **step by step**
 
 ### 💻 Code Example
 
-```java
+```typescript
 public class Pizza {
     private String dough;
     private String sauce;
@@ -343,7 +343,7 @@ The Prototype Pattern creates new objects by **copying an existing object** (pro
 
 ### 💻 Code Example
 
-```java
+```typescript
 public class User implements Cloneable {
     private String name;
     private String email;
