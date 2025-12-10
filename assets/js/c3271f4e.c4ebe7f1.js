@@ -1,1 +1,0 @@
-"use strict";(globalThis.webpackChunkdevcoder_blogs=globalThis.webpackChunkdevcoder_blogs||[]).push([[560],{9055:e=>{e.exports=JSON.parse('{"metadata":{"permalink":"/devcoder-blogs/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":4,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
