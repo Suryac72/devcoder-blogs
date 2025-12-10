@@ -23,7 +23,7 @@ The Observer Pattern defines a one-to-many relationship where when one object (S
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Observer interface
 interface StockObserver {
     void update(double price);
@@ -117,7 +117,7 @@ Defines a family of algorithms, encapsulates each one, and makes them interchang
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Strategy interface
 interface PaymentStrategy {
     void pay(double amount);
@@ -198,7 +198,7 @@ cart.checkout(50.00);
 ### 🎯 Problem
 Your object's behavior changes drastically based on its **internal state**. You end up with massive if-else statements checking the state in every method.
 
-```java
+```typescript
 // ❌ Bad: Large if-else chains
 public void process() {
     if (state == PENDING) { ... }
@@ -212,7 +212,7 @@ Encapsulates different behaviors for different states, making the object appear 
 
 ### 💻 Code Example
 
-```java
+```typescript
 // State interface
 interface OrderState {
     void process(Order order);
@@ -298,7 +298,7 @@ Creates a chain of handler objects where each handler decides to process or pass
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Handler interface
 abstract class SupportHandler {
     protected SupportHandler nextHandler;
@@ -383,7 +383,7 @@ Encapsulates a request as an object, allowing you to parameterize with different
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Command interface
 interface Command {
     void execute();
@@ -501,7 +501,7 @@ Defines an object that encapsulates how objects interact and centralizes communi
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Mediator
 interface ChatMediator {
     void sendMessage(String message, User sender);
@@ -560,7 +560,7 @@ You need to **save and restore an object's state** without exposing its internal
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Memento
 class EditorMemento {
     private String content;
@@ -623,7 +623,7 @@ Multiple classes have the **same algorithm structure** but differ in details. Yo
 
 ### 💻 Code Example
 
-```java
+```typescript
 // Abstract template
 abstract class ReportGenerator {
     public final void generate() { // Template method

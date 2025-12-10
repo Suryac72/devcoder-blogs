@@ -68,7 +68,7 @@ Remove: O(n)     Remove: O(n)
 
 ### Synchronized vs Volatile
 
-```java
+```typescript
 // Synchronized - mutual exclusion + visibility
 synchronized void method() { }
 
@@ -78,7 +78,7 @@ volatile int count;
 
 ### Immutable vs Thread-Safe
 
-```java
+```typescript
 // Immutable - inherently thread-safe
 final class Immutable {
     private final int value;
