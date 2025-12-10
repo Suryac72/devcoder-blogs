@@ -1,0 +1,72 @@
+/**
+ * Modern Hero Section with Subtle Grid Background
+ */
+
+.heroBanner {
+  /* Light Mode: Soft Blue Gradient + Blue Grid Dots */
+  background-color: #eff6ff;
+  background-image: 
+    radial-gradient(#a9cbf4 1px, transparent 1px), /* The Dots */
+    linear-gradient(180deg, #6da9f8 0%, #ffffff 100%); /* The Fade */
+  background-size: 30px 30px, 100% 100%;
+  
+  padding: 6rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid #e2e8f0;
+
+  /* Force text to use theme color (prevents invisible text bug) */
+  color: var(--ifm-font-color-base);
+}
+
+/* Fade the grid out at the bottom */
+.heroBanner::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  /* Updated to fade to white (matches the bottom of the gradient) */
+  background: linear-gradient(to bottom, transparent, #ffffff);
+  pointer-events: none;
+}
+
+/* Dark Mode Adaptation */
+:global([data-theme='dark']) .heroBanner {
+  background-color: #0f172a;
+  /* Reset background image to just dots for dark mode */
+  background-image: radial-gradient(#334155 1px, transparent 1px);
+  border-bottom: 1px solid #1e293b;
+}
+
+:global([data-theme='dark']) .heroBanner::after {
+  /* Fade to dark slate in dark mode */
+  background: linear-gradient(to bottom, transparent, #0f172a);
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 4rem 2rem;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Optional: Enhancing the Hero Title locally */
+.heroTitle {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, var(--ifm-color-primary) 0%, var(--ifm-color-primary-darker) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

@@ -1,0 +1,266 @@
+/**
+ * Devcoder Knowledge Base - Professional Styling
+ * Theme: Modern Tech (Clean, High Contrast, Subtle Depth)
+ */
+
+/* 1. TYPOGRAPHY & VARIABLES ------------------------------ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Brand Colors - Refined "Electric Blue" Palette */
+  --ifm-color-primary: #3b82f6;        /* Tailwind Blue-500 */
+  --ifm-color-primary-dark: #2563eb;   /* Tailwind Blue-600 */
+  --ifm-color-primary-darker: #1d4ed8; /* Tailwind Blue-700 */
+  --ifm-color-primary-darkest: #1e3a8a;/* Tailwind Blue-900 */
+  --ifm-color-primary-light: #60a5fa;  /* Tailwind Blue-400 */
+  --ifm-color-primary-lighter: #93c5fd;/* Tailwind Blue-300 */
+  --ifm-color-primary-lightest: #dbeafe;/* Tailwind Blue-100 */
+
+  /* Spacing & Layout */
+  --ifm-code-font-size: 90%;
+  --docusaurus-highlighted-code-line-bg: rgba(59, 130, 246, 0.1);
+  --ifm-font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Cards & Depth */
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark Mode Overrides */
+[data-theme='dark'] {
+  --ifm-color-primary: #60a5fa;
+  --ifm-color-primary-dark: #3b82f6;
+  --ifm-color-primary-darker: #2563eb;
+  --ifm-color-primary-darkest: #1d4ed8;
+  --ifm-color-primary-light: #93c5fd;
+  --ifm-color-primary-lighter: #bfdbfe;
+  --ifm-color-primary-lightest: #eff6ff;
+  --docusaurus-highlighted-code-line-bg: rgba(96, 165, 250, 0.15);
+  --ifm-background-color: #0f172a; /* Slate-900 for a richer dark mode */
+}
+
+/* 2. NAVBAR (Glassmorphism) ------------------------------ */
+.navbar {
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  box-shadow: none; /* Remove default shadow for cleaner look */
+  height: 4rem; /* Slightly taller for elegance */
+}
+
+[data-theme='dark'] .navbar {
+  background-color: rgba(15, 23, 42, 0.85);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.navbar__logo {
+  height: 2rem;
+}
+
+.navbar__title {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--ifm-color-primary) 0%, var(--ifm-color-primary-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 3. SIDEBAR (Rounded Pills) ------------------------------ */
+.theme-doc-sidebar-menu {
+  padding-right: 1rem;
+}
+
+.menu__link {
+  border-radius: 8px; /* Rounded pill shape */
+  font-weight: 500;
+  color: var(--ifm-color-content-secondary);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 2px 0;
+}
+
+.menu__link:hover {
+  background-color: var(--ifm-color-emphasis-100);
+  color: var(--ifm-color-primary);
+  transform: translateX(2px);
+}
+
+/* Active State - Soft Pill */
+.menu__link--active {
+  background-color: var(--ifm-color-primary-lightest);
+  color: var(--ifm-color-primary-dark);
+  font-weight: 600;
+  border-left: none; /* Remove old border style */
+}
+
+[data-theme='dark'] .menu__link--active {
+  background-color: rgba(59, 130, 246, 0.15); /* Transparent blue for dark mode */
+  color: var(--ifm-color-primary-light);
+}
+
+/* 4. CONTENT & TYPOGRAPHY ------------------------------ */
+article header h1 {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 3rem;
+  border-bottom: none; /* Removed harsh border */
+  position: relative;
+}
+
+/* 5. CODE BLOCKS (Mac-OS / IDE Style) ------------------------------ */
+.codeBlock, pre {
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+[data-theme='dark'] .codeBlock {
+  border: 1px solid rgba(255,255,255,0.1);
+  background-color: #1e293b; /* Slate-800 */
+}
+
+/* The Header Bar of Code Blocks */
+.docusaurus-highlight-code-block-title, 
+div[class^="codeBlockTitle_"] {
+  background-color: #f8fafc;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  color: #64748b;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+}
+
+[data-theme='dark'] .docusaurus-highlight-code-block-title,
+div[class^="codeBlockTitle_"] {
+  background-color: #0f172a; /* Match dark theme bg */
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: #94a3b8;
+}
+
+/* Fake Mac Window Controls (Visual Polish) */
+div[class^="codeBlockTitle_"]::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff5f56; /* Red */
+  box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f; /* Yellow & Green */
+  margin-right: 60px; /* Push title to right */
+}
+
+/* 6. TABLES (Clean & Minimal) ------------------------------ */
+.markdown table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.05); /* Subtle border */
+  margin: 2rem 0;
+}
+
+.markdown table thead tr {
+  background-color: #f1f5f9;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+[data-theme='dark'] .markdown table thead tr {
+  background-color: #1e293b;
+  border-bottom: 2px solid #334155;
+}
+
+.markdown table th {
+  color: var(--ifm-font-color-base);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  padding: 1rem;
+}
+
+.markdown table td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+[data-theme='dark'] .markdown table td {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* 7. ADMONITIONS (Callouts) ------------------------------ */
+/* Make standard alerts look more modern */
+.alert {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  padding: 1.5rem;
+}
+
+.alert--info {
+  background-color: #eff6ff;
+  border-left: 5px solid var(--ifm-color-primary);
+}
+[data-theme='dark'] .alert--info {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* 8. BUTTONS ------------------------------ */
+.button {
+  font-family: var(--ifm-font-family-base);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.button--primary {
+  background: var(--ifm-color-primary);
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+}
+
+.button--primary:hover {
+  background: var(--ifm-color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
+}
+
+/* 9. HERO FIX (FORCE VISIBLE TEXT) ------------------------- */
+/* This overrides the default 'hero--primary' white text issue */
+.hero.hero--primary {
+  --ifm-hero-text-color: var(--ifm-font-color-base) !important;
+  color: var(--ifm-font-color-base) !important;
+  background-color: var(--ifm-background-surface-color) !important;
+}
+
+/* Ensure the title is also dark (or light in dark mode) */
+.hero.hero--primary .hero__title,
+.hero.hero--primary .hero__subtitle {
+  color: var(--ifm-font-color-base) !important;
+}
+
+
+.button:hover {
+  color: white !important;
+  text-decoration: none;
+}
+
+.button--secondary:hover,
+.button--outline:hover {
+  background-color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+  color: white !important;
+}

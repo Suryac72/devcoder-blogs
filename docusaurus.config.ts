@@ -1,0 +1,201 @@
+import {themes as prismThemes} from 'prism-react-renderer';
+import type {Config} from '@docusaurus/types';
+import type * as Preset from '@docusaurus/preset-classic';
+
+// This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+
+const config: Config = {
+  title: 'Devcoder Knowledge Base',
+  tagline: 'Master multiple technologies and concepts for technical interviews',
+  favicon: 'img/favicon.ico',
+
+  // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
+  future: {
+    v4: true, // Improve compatibility with the upcoming Docusaurus v4
+  },
+
+  // Set the production url of your site here
+  url: 'https://devcoder-kb.com',
+  // Set the /<baseUrl>/ pathname under which your site is served
+  // For GitHub pages deployment, it is often '/<projectName>/'
+  baseUrl: '/',
+
+  // GitHub pages deployment config.
+  // If you aren't using GitHub pages, you don't need these.
+  organizationName: 'devcoder', // Usually your GitHub org/user name.
+  projectName: 'devcoder-kb', // Usually your repo name.
+
+  onBrokenLinks: 'throw',
+
+  // Even if you don't use internationalization, you can use this field to set
+  // useful metadata like html lang. For example, if your site is Chinese, you
+  // may want to replace "en" with "zh-Hans".
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en'],
+  },
+
+  presets: [
+    [
+      'classic',
+      {
+        docs: {
+          sidebarPath: './sidebars.ts',
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+          editUrl:
+            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+        },
+        blog: {
+          showReadingTime: true,
+          feedOptions: {
+            type: ['rss', 'atom'],
+            xslt: true,
+          },
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+          editUrl:
+            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          // Useful options to enforce blogging best practices
+          onInlineTags: 'warn',
+          onInlineAuthors: 'warn',
+          onUntruncatedBlogPosts: 'warn',
+        },
+        theme: {
+          customCss: './src/css/custom.css',
+        },
+      } satisfies Preset.Options,
+    ],
+  ],
+
+  themeConfig: {
+    // Replace with your project's social card
+    image: 'img/docusaurus-social-card.jpg',
+    colorMode: {
+      respectPrefersColorScheme: true,
+    },
+    navbar: {
+      title: 'Devcoder Blogs',
+      logo: {
+        alt: 'Devcoder Knowledge Base',
+        src: 'img/logo.svg',
+      },
+      items: [
+        {
+          type: 'docSidebar',
+          sidebarId: 'knowledgeBaseSidebar',
+          position: 'left',
+          label: 'Knowledge Base',
+        },
+        {
+          type: 'dropdown',
+          label: 'Technologies',
+          position: 'left',
+          items: [
+            {
+              label: 'Java',
+              to: '/docs/java-for-interviews/multithreading',
+            },
+            {
+              label: 'JavaScript & TypeScript',
+              to: '/docs/intro',
+            },
+            {
+              label: 'React',
+              to: '/docs/intro',
+            },
+            {
+              label: 'Data Structures & Algorithms',
+              to: '/docs/data-structures/arrays-lists',
+            },
+            {
+              label: 'System Design',
+              to: '/docs/intro',
+            },
+          ],
+        },
+        {to: '/blog', label: 'Blog', position: 'left'},
+        {
+          href: 'https://github.com/Suryac72',
+          label: 'GitHub',
+          position: 'right',
+        },
+      ],
+    },
+    footer: {
+      style: 'dark',
+      links: [
+        {
+          title: 'Technologies',
+          items: [
+            {
+              label: 'Java',
+              to: '/docs/intro',
+            },
+            {
+              label: 'JavaScript & TypeScript',
+              to: '/docs/intro',
+            },
+            {
+              label: 'React',
+              to: '/docs/intro',
+            },
+            {
+              label: 'Data Structures & Algorithms',
+              to: '/docs/intro',
+            },
+            {
+              label: 'System Design',
+              to: '/docs/intro',
+            },
+          ],
+        },
+        {
+          title: 'Resources',
+          items: [
+            {
+              label: 'Blog Articles',
+              to: '/blog',
+            },
+            {
+              label: 'Interview Tips',
+              to: '/blog',
+            },
+            {
+              label: 'Code Examples',
+              to: '/blog',
+            },
+            {
+              label: 'Quick Reference',
+              to: '/docs/quick-reference',
+            },
+          ],
+        },
+        {
+          title: 'Community',
+          items: [
+            {
+              label: 'GitHub',
+              href: 'https://github.com/Suryac72',
+            },
+            {
+              label: 'Stack Overflow',
+              href: 'https://stackoverflow.com/questions/tagged/devcoder',
+            },
+            {
+              label: 'Contribute',
+              href: 'https://github.com/Suryac72/devcoder-blogs/issues',
+            },
+          ],
+        },
+      ],
+      copyright: `Copyright © ${new Date().getFullYear()} Devcoder Blogs. Built with ❤️ for developers learning multiple technologies.`,
+    },
+    prism: {
+      theme: prismThemes.github,
+      darkTheme: prismThemes.dracula,
+    },
+  } satisfies Preset.ThemeConfig,
+};
+
+export default config;
