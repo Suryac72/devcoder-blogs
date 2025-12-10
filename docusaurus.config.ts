@@ -1,68 +1,64 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
-import type * as Preset from '@docusaurus/preset-classic';
+import { themes as prismThemes } from "prism-react-renderer";
+import type { Config } from "@docusaurus/types";
+import type * as Preset from "@docusaurus/preset-classic";
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'Devcoder Knowledge Base',
-  tagline: 'Master multiple technologies and concepts for technical interviews',
-  favicon: 'img/favicon.ico',
+  title: "Devcoder Knowledge Base",
+  tagline: "Master multiple technologies and concepts for technical interviews",
+  favicon: "img/favicon.ico",
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
   },
 
-  // Set the production url of your site here
-  url: 'https://devcoder-kb.com',
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  url: "https://suryac72.github.io",
+  baseUrl: "/devcoder-blogs/",
 
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'devcoder', // Usually your GitHub org/user name.
-  projectName: 'devcoder-kb', // Usually your repo name.
+  organizationName: "Suryac72",
+  projectName: "devcoder-blogs",
 
-  onBrokenLinks: 'throw',
+
+  onBrokenLinks: "throw",
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: "en",
+    locales: ["en"],
   },
 
   presets: [
     [
-      'classic',
+      "classic",
       {
         docs: {
-          sidebarPath: './sidebars.ts',
+          sidebarPath: "./sidebars.ts",
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
         },
         blog: {
           showReadingTime: true,
           feedOptions: {
-            type: ['rss', 'atom'],
+            type: ["rss", "atom"],
             xslt: true,
           },
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
           // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
+          onInlineTags: "warn",
+          onInlineAuthors: "warn",
+          onUntruncatedBlogPosts: "warn",
         },
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: "./src/css/custom.css",
         },
       } satisfies Preset.Options,
     ],
@@ -70,89 +66,89 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    image: "img/docusaurus-social-card.jpg",
     colorMode: {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'Devcoder Blogs',
+      title: "Devcoder Blogs",
       logo: {
-        alt: 'Devcoder Knowledge Base',
-        src: 'img/logo.svg',
+        alt: "Devcoder Knowledge Base",
+        src: "img/logo.svg",
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'knowledgeBaseSidebar',
-          position: 'left',
-          label: 'Knowledge Base',
+          type: "docSidebar",
+          sidebarId: "knowledgeBaseSidebar",
+          position: "left",
+          label: "Knowledge Base",
         },
         {
-          type: 'dropdown',
-          label: 'Technologies',
-          position: 'left',
+          type: "dropdown",
+          label: "Technologies",
+          position: "left",
           items: [
             {
-              label: 'Java',
-              to: '/docs/java-for-interviews/multi-threading',
-            }
+              label: "Java",
+              to: "/docs/java-for-interviews/multi-threading",
+            },
           ],
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        { to: "/blog", label: "Blog", position: "left" },
         {
-          href: 'https://github.com/Suryac72',
-          label: 'GitHub',
-          position: 'right',
+          href: "https://github.com/Suryac72",
+          label: "GitHub",
+          position: "right",
         },
       ],
     },
     footer: {
-      style: 'dark',
+      style: "dark",
       links: [
         {
-          title: 'Technologies',
+          title: "Technologies",
           items: [
             {
-              label: 'Java',
-              to: '/docs/intro',
-            }
-          ],
-        },
-        {
-          title: 'Resources',
-          items: [
-            {
-              label: 'Blog Articles',
-              to: '/blog',
-            },
-            {
-              label: 'Interview Tips',
-              to: '/blog',
-            },
-            {
-              label: 'Code Examples',
-              to: '/blog',
-            },
-            {
-              label: 'Quick Reference',
-              to: '/docs/quick-reference',
+              label: "Java",
+              to: "/docs/intro",
             },
           ],
         },
         {
-          title: 'Community',
+          title: "Resources",
           items: [
             {
-              label: 'GitHub',
-              href: 'https://github.com/Suryac72',
+              label: "Blog Articles",
+              to: "/blog",
             },
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/devcoder',
+              label: "Interview Tips",
+              to: "/blog",
             },
             {
-              label: 'Contribute',
-              href: 'https://github.com/Suryac72/devcoder-blogs/issues',
+              label: "Code Examples",
+              to: "/blog",
+            },
+            {
+              label: "Quick Reference",
+              to: "/docs/quick-reference",
+            },
+          ],
+        },
+        {
+          title: "Community",
+          items: [
+            {
+              label: "GitHub",
+              href: "https://github.com/Suryac72",
+            },
+            {
+              label: "Stack Overflow",
+              href: "https://stackoverflow.com/questions/tagged/devcoder",
+            },
+            {
+              label: "Contribute",
+              href: "https://github.com/Suryac72/devcoder-blogs/issues",
             },
           ],
         },
