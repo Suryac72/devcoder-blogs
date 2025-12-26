@@ -1,0 +1,1391 @@
+---
+title: Multi Threading in Java
+---
+
+# Multithreading in Java
+
+A comprehensive guide to Java multithreading with detailed code examples and explanations. This package covers fundamental to advanced concurrency concepts for interview preparation.
+
+---
+
+## Table of Contents
+
+1. [Thread Basics](#thread-basics)
+2. [Thread Lifecycle](#thread-lifecycle)
+3. [Thread Types](#thread-types)
+4. [Thread Methods](#thread-methods)
+5. [Synchronization](#synchronization)
+6. [Locks](#locks)
+7. [Synchronization Utilities](#synchronization-utilities)
+8. [Deadlocks](#deadlocks)
+9. [Executor Framework](#executor-framework)
+10. [Asynchronous Programming](#asynchronous-programming)
+11. [Volatile vs Atomic](#volatile-vs-atomic)
+12. [Thread Communication](#thread-communication)
+
+---
+
+## Thread Basics
+
+### What is a Thread?
+A thread is the smallest unit of execution within a process. Java provides built-in support for multithreaded programming through the `Thread` class and `Runnable` interface.
+
+### Creating Threads
+
+#### Method 1: Extending Thread Class
+
+```typescript
+class ThreadUsingThreadClass extends Thread {
+    public ThreadUsingThreadClass(String name) {
+        super(name);  // Set thread name
+    }
+    
+    @Override
+    public void run() {
+        System.out.println("This thread is created via thread class....");
+    }
+}
+
+// Usage
+ThreadUsingThreadClass thread = new ThreadUsingThreadClass("MyThread");
+thread.start();  // Always call start(), not run()
+```
+
+**Key Points:**
+- Extend the `Thread` class
+- Override the `run()` method
+- Call `start()` method to begin execution (not `run()`)
+- Allows only single inheritance
+
+#### Method 2: Implementing Runnable Interface
+```typescript
+class ThreadUsingRunnableInterface implements Runnable {
+    @Override
+    public void run() {
+        System.out.println("This thread is created via Runnable interface....");
+        for(int i = 0; i < 10000; i++) {
+            System.out.println("Thread " + Thread.currentThread().getName() + " called " + i + " time");
+        }
+    }
+}
+
+// Usage
+Thread thread = new Thread(new ThreadUsingRunnableInterface(), "MyRunnable");
+thread.start();
+```
+
+**Key Points:**
+- Implement the `Runnable` interface
+- Override the `run()` method
+- Preferred in modern Java (allows implementation of other interfaces)
+- Thread object is created separately
+
+#### Basic Example
+```typescript
+public class Main {
+    public static void main(String args[]) {
+        // Create threads using both methods
+        ThreadUsingThreadClass thread1 = new ThreadUsingThreadClass("Thread1");
+        ThreadUsingRunnableInterface threadUsingRunnableInterface = new ThreadUsingRunnableInterface();
+        Thread thread2 = new Thread(threadUsingRunnableInterface, "Thread2");
+        
+        thread1.start();
+        thread2.start();
+    }
+}
+```
+
+---
+
+## Thread Lifecycle
+
+A thread in Java goes through 5 different states during its lifecycle:
+
+### States:
+1. **NEW** - Thread is created but not yet started
+2. **RUNNABLE** - Thread is ready to run and waiting for CPU time
+3. **RUNNING** - Thread is actively executing
+4. **BLOCKED/WAITING** - Thread is waiting for a resource or another thread
+5. **TERMINATED** - Thread has finished execution
+
+### Code Example:
+```typescript
+public class ThreadLifeCycle extends Thread {
+    @Override
+    public void run() {
+        System.out.println("Running....");
+        try {
+            Thread.sleep(2000);  // Transition to TIMED_WAITING
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    public static void main(String args[]) {
+        ThreadLifeCycle thread1 = new ThreadLifeCycle();
+        System.out.println(thread1.getState());  // NEW
+        
+        thread1.start();  // RUNNABLE
+        System.out.println(thread1.getState());
+        
+        try {
+            Thread.sleep(100);  // Allow thread to transition
+            System.out.println(thread1.getState());  // TIMED_WAITING
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+        
+        try {
+            thread1.join();  // Wait for thread to complete
+            System.out.println(thread1.getState());  // TERMINATED
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+```
+
+### State Diagram:
+```
+NEW → RUNNABLE → RUNNING → BLOCKED/WAITING → TERMINATED
+                    ↑                          ↓
+                    └──────────────────────────┘
+```
+
+---
+
+## Thread Types
+
+### User Threads (Non-Daemon Threads)
+- Responsible for executing the main logic of the application
+- JVM waits for all user threads to complete before terminating
+- Application will not shut down as long as a user thread is running
+- Created by default when you create new threads
+
+### Daemon Threads
+- Low-priority threads that provide background services (e.g., garbage collection, finalizers)
+- JVM does not wait for daemon threads before shutting down
+- Automatically terminated when all user threads are finished
+- Used for housekeeping or monitoring activities
+
+### Code Example:
+```typescript
+public class ThreadTypes extends Thread {
+    @Override
+    public void run() {
+        while(true) {
+            System.out.println("Thread running.......");
+        }
+    }
+    
+    public static void main(String[] args) {
+        ThreadTypes thread1 = new ThreadTypes();
+        ThreadTypes thread2 = new ThreadTypes();
+        
+        thread1.setDaemon(true);  // Set thread1 as daemon
+        thread1.start();  // Will not prevent JVM shutdown
+        
+        thread2.start();  // User thread (prevents JVM shutdown)
+        System.out.println("Main Done");
+    }
+}
+```
+
+**Key Differences:**
+| Feature | User Thread | Daemon Thread |
+|---------|-------------|---------------|
+| JVM Wait | Yes | No |
+| Priority | Normal | Low |
+| Examples | Main thread, custom tasks | GC, finalizers |
+| Termination | Explicit | Automatic |
+
+---
+
+## Thread Methods
+
+### Important Thread Methods
+
+#### 1. **setPriority() / getPriority()**
+```typescript
+thread.setPriority(Thread.MAX_PRIORITY);    // Priority: 10
+thread.setPriority(Thread.NORM_PRIORITY);   // Priority: 5
+thread.setPriority(Thread.MIN_PRIORITY);    // Priority: 1
+```
+- Range: 1-10 (default is 5)
+- Higher priority threads get more CPU time (not guaranteed)
+
+#### 2. **yield()**
+```typescript
+@Override
+public void run() {
+    for(int i = 0; i < 5; i++) {
+        System.out.println(Thread.currentThread().getName() + " is running");
+        Thread.yield();  // Hint to scheduler
+    }
+}
+```
+- Hints to the scheduler that current thread is willing to yield
+- Scheduler is free to ignore this hint
+- Rarely guarantees thread switch
+
+#### 3. **interrupt()**
+```typescript
+thread.interrupt();  // Request thread to interrupt
+```
+- Interrupts the thread
+- Sets the interrupt flag to true
+- Used to request graceful termination
+
+#### 4. **join()**
+```typescript
+thread.join();  // Wait for thread to complete
+```
+- Current thread waits for the specified thread to complete
+- Useful for synchronizing multiple threads
+
+#### 5. **sleep()**
+```typescript
+Thread.sleep(2000);  // Sleep for 2000 milliseconds
+```
+- Causes current thread to sleep for specified time
+- Throws `InterruptedException`
+
+### Code Example:
+```typescript
+public class ThreadMethods extends Thread {
+    public static void main(String args[]) {
+        ThreadMethods thread1 = new ThreadMethods();
+        ThreadMethods thread2 = new ThreadMethods();
+        
+        // Set priorities
+        thread1.setPriority(Thread.MAX_PRIORITY);
+        thread2.setPriority(Thread.MIN_PRIORITY);
+        
+        thread1.start();
+        thread2.start();
+        
+        // Interrupt a thread
+        ThreadLifeCycle t1 = new ThreadLifeCycle();
+        t1.start();
+        t1.interrupt();  // Interrupt the thread
+    }
+    
+    @Override
+    public void run() {
+        for(int i = 0; i < 5; i++) {
+            System.out.println(Thread.currentThread().getName() + " is running");
+            Thread.yield();  // Yield to other threads
+        }
+    }
+}
+```
+
+---
+
+## Synchronization
+
+### Problem: Race Condition
+When multiple threads access shared resources without proper synchronization, inconsistencies occur.
+
+### Solution: Synchronized Keyword
+The `synchronized` keyword prevents concurrent access to shared resources.
+
+### Types of Synchronization:
+
+#### 1. Synchronized Method
+```typescript
+class Counter {
+    private int count = 0;
+    
+    public synchronized void increment() {
+        count++;  // Only one thread can execute this at a time
+    }
+    
+    public synchronized void decrement() {
+        count--;
+    }
+    
+    public int getCount() {
+        return count;
+    }
+}
+```
+
+#### 2. Synchronized Block
+```typescript
+class Counter {
+    private int count = 0;
+    
+    public void increment() {
+        synchronized(this) {  // Critical section
+            count++;
+        }
+    }
+}
+```
+
+### Code Example:
+```typescript
+public class Synchronization extends Thread {
+    private final Counter counter;
+    
+    public Synchronization(Counter counter) {
+        this.counter = counter;
+    }
+    
+    @Override
+    public void run() {
+        for(int i = 1; i <= 1000; i++) {
+            counter.increment();
+        }
+    }
+    
+    public static void main(String[] args) {
+        Counter counter = new Counter();
+        Synchronization t1 = new Synchronization(counter);
+        Synchronization t2 = new Synchronization(counter);
+        
+        t1.start();
+        t2.start();
+        
+        try {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+        
+        System.out.println(counter.getCount());  // Output: 2000
+    }
+}
+```
+
+### How Synchronization Works:
+1. Only one thread can execute synchronized code at a time
+2. Other threads are blocked and enter a wait queue
+3. When lock is released, one thread from queue is chosen
+4. Ensures mutual exclusion and prevents race conditions
+
+**Key Points:**
+- Synchronized method locks the entire object
+- Synchronized block locks only the critical section
+- Every object has an intrinsic lock (monitor)
+- Helps achieve **mutual exclusion** and **memory visibility**
+
+---
+
+## Locks
+
+### Intrinsic Locks vs Explicit Locks
+
+#### Intrinsic Locks (Built-in)
+- Used with `synchronized` keyword
+- Automatically acquired and released
+- Simple but less flexible
+
+#### Explicit Locks (java.util.concurrent.locks)
+- Provide more control and flexibility
+- Manual acquisition and release
+- Allow advanced features like fairness and timeouts
+
+### Types of Locks:
+
+### 1. ReentrantLock
+A reentrant lock that can be acquired multiple times by the same thread.
+
+```typescript
+public class ReentrantLockExample {
+    private final Lock lock = new ReentrantLock();
+    
+    public void innerMethod() {
+        lock.lock();
+        try {
+            System.out.println("Inner method");
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    public void outerMethod() {
+        lock.lock();
+        try {
+            System.out.println("Outer method");
+            innerMethod();  // Same thread can acquire lock again
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    public static void main(String[] args) {
+        ReentrantLockExample example = new ReentrantLockExample();
+        example.outerMethod();
+    }
+}
+```
+
+**Key Features:**
+- Lock count maintained for reentrancy
+- Same thread can acquire multiple times
+- Must unlock same number of times
+
+### 2. ReadWriteLock
+Separates read and write locks for better concurrency.
+
+```typescript
+public class ReadWriteLockExample {
+    private int count = 0;
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Lock readLock = lock.readLock();
+    private final Lock writeLock = lock.writeLock();
+    
+    public void increment() {
+        writeLock.lock();  // Exclusive lock
+        try {
+            System.out.println("Counter incremented");
+            count++;
+        } finally {
+            writeLock.unlock();
+        }
+    }
+    
+    public int getCount() {
+        readLock.lock();  // Shared lock
+        try {
+            System.out.println("Counter is " + count);
+            return count;
+        } finally {
+            readLock.unlock();
+        }
+    }
+    
+    public static void main(String[] args) {
+        ReadWriteLockExample counter = new ReadWriteLockExample();
+        
+        Runnable readTask = () -> {
+            for(int i = 0; i < 10; i++) {
+                counter.getCount();
+            }
+        };
+        
+        Runnable writeTask = () -> {
+            for(int i = 0; i < 10; i++) {
+                counter.increment();
+            }
+        };
+        
+        Thread readThread1 = new Thread(readTask, "ReadThread1");
+        Thread readThread2 = new Thread(readTask, "ReadThread2");
+        Thread writeThread = new Thread(writeTask, "WriteThread");
+        
+        writeThread.start();
+        readThread1.start();
+        readThread2.start();
+    }
+}
+```
+
+**Key Features:**
+- Multiple readers can acquire read lock simultaneously
+- Only one writer can acquire write lock
+- Improves performance for read-heavy operations
+- Writers block all readers and other writers
+
+### 3. Lock with Timeout (tryLock)
+```typescript
+class BankAccount {
+    private int balance = 100;
+    private final Lock lock = new ReentrantLock();
+    
+    public void withDraw(int amount) {
+        System.out.println(Thread.currentThread().getName() + " attempting to withdraw " + amount);
+        try {
+            // Try to acquire lock with timeout
+            if(lock.tryLock(1000, TimeUnit.MILLISECONDS)) {
+                if(balance >= amount) {
+                    try {
+                        System.out.println("Proceeding with payment...");
+                        Thread.sleep(3000);
+                        balance -= amount;
+                        System.out.println("Withdrawal completed. Balance: " + balance);
+                    } finally {
+                        lock.unlock();
+                    }
+                }
+            } else {
+                System.out.println("Could not acquire lock within timeout");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}
+```
+
+### 4. Fair Lock vs Unfair Lock
+```typescript
+public class UnfairLockExample {
+    // Fair lock: threads acquire in FIFO order
+    private final Lock fairLock = new ReentrantLock(true);
+    
+    // Unfair lock: no specific order (default)
+    private final Lock unfairLock = new ReentrantLock(false);
+    
+    public void accessResource() {
+        unfairLock.lock();
+        System.out.println(Thread.currentThread().getName() + " acquired the lock");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            System.out.println(Thread.currentThread().getName() + " released the lock");
+            unfairLock.unlock();
+        }
+    }
+}
+```
+
+**Comparison:**
+| Aspect | Fair Lock | Unfair Lock |
+|--------|-----------|------------|
+| Order | FIFO | No guarantee |
+| Performance | Lower | Higher |
+| Predictability | High | Low |
+| Starvation Risk | Low | High |
+
+---
+
+## Synchronization Utilities
+
+### 1. CountDownLatch
+Allows one or more threads to wait until a set of operations complete.
+
+```typescript
+public class CountDownLatchExample {
+    public static void main(String[] args) throws InterruptedException {
+        int numberOfServices = 3;
+        CountDownLatch latch = new CountDownLatch(numberOfServices);
+        
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfServices);
+        executorService.submit(new DependentService("Database", latch));
+        executorService.submit(new DependentService("Cache", latch));
+        executorService.submit(new DependentService("Messaging", latch));
+        
+        latch.await();  // Wait for all services to complete
+        System.out.println("All services initialized. Starting application...");
+        executorService.shutdown();
+    }
+}
+
+class DependentService implements Callable<String> {
+    private final String serviceName;
+    private final CountDownLatch latch;
+    
+    public DependentService(String serviceName, CountDownLatch latch) {
+        this.serviceName = serviceName;
+        this.latch = latch;
+    }
+    
+    @Override
+    public String call() throws Exception {
+        try {
+            Thread.sleep(2000);  // Simulate initialization
+            System.out.println(serviceName + " is initialized.");
+        } finally {
+            latch.countDown();  // Decrement count
+        }
+        return serviceName + " is ready.";
+    }
+}
+```
+
+**Key Points:**
+- One-time use only (not reusable)
+- Useful for startup scenarios
+- `countDown()` decrements count
+- `await()` blocks until count reaches zero
+
+**Use Cases:**
+- Waiting for multiple services to initialize
+- Running tests in parallel with main thread waiting
+- Coordinating startup sequences
+
+### 2. CyclicBarrier
+Allows a set of threads to wait for each other at a barrier point. **Reusable**.
+
+```typescript
+public class CyclicBarrierExample {
+    public static void main(String[] args) {
+        int numberOfSubSystems = 4;
+        CyclicBarrier barrier = new CyclicBarrier(numberOfSubSystems, () -> {
+            System.out.println("All subsystems are ready. Proceeding...");
+        });
+        
+        Thread dbThread = new Thread(new SubSystem("Database", 2000, barrier));
+        Thread cacheThread = new Thread(new SubSystem("Cache", 3000, barrier));
+        Thread messagingThread = new Thread(new SubSystem("Messaging", 4000, barrier));
+        Thread apiThread = new Thread(new SubSystem("API", 2500, barrier));
+        
+        dbThread.start();
+        cacheThread.start();
+        messagingThread.start();
+        apiThread.start();
+    }
+}
+
+class SubSystem implements Runnable {
+    private final String name;
+    private final int initializationTime;
+    private final CyclicBarrier barrier;
+    
+    public SubSystem(String name, int initializationTime, CyclicBarrier barrier) {
+        this.name = name;
+        this.initializationTime = initializationTime;
+        this.barrier = barrier;
+    }
+    
+    @Override
+    public void run() {
+        try {
+            System.out.println(name + " is initializing...");
+            Thread.sleep(initializationTime);
+            System.out.println(name + " has completed initialization.");
+            barrier.await();  // Wait for all threads
+            System.out.println(name + " is proceeding with main task.");
+        } catch (InterruptedException | BrokenBarrierException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}
+```
+
+**Key Points:**
+- **Reusable** - can be used multiple times
+- All threads wait at barrier point
+- When all threads arrive, they proceed together
+- Optional action runs when all threads meet
+
+**CountDownLatch vs CyclicBarrier:**
+| Feature | CountDownLatch | CyclicBarrier |
+|---------|----------------|---------------|
+| Reusable | No | Yes |
+| Direction | One-way | Bidirectional |
+| Flexibility | Less | More |
+| Use Case | Wait for tasks | Synchronize tasks |
+
+---
+
+## Deadlocks
+
+### What is a Deadlock?
+A deadlock occurs when two or more threads are blocked forever, waiting for each other.
+
+### Conditions for Deadlock (All 4 must be true):
+
+1. **Mutual Exclusion** - Only one thread can access a resource at a time
+2. **Hold and Wait** - Thread holding a resource waits for another
+3. **No Preemption** - Resources cannot be forcibly taken
+4. **Circular Wait** - Circular chain of threads waiting for resources
+
+### Example of Deadlock:
+```typescript
+class Pen {
+    public synchronized void writeWithPenAndPaper(Paper paper) {
+        System.out.println(Thread.currentThread().getName() + " is using pen and trying to write");
+        paper.finishWriting();  // Waits for paper lock
+    }
+    
+    public synchronized void finishWriting() {
+        System.out.println(Thread.currentThread().getName() + " finished using pen");
+    }
+}
+
+class Paper {
+    public synchronized void writeWithPaperAndPen(Pen pen) {
+        System.out.println(Thread.currentThread().getName() + " is using paper and trying to write");
+        pen.finishWriting();  // Waits for pen lock
+    }
+    
+    public synchronized void finishWriting() {
+        System.out.println(Thread.currentThread().getName() + " finished using paper");
+    }
+}
+
+class Task1 implements Runnable {
+    private Pen pen;
+    private Paper paper;
+    
+    public Task1(Pen pen, Paper paper) {
+        this.pen = pen;
+        this.paper = paper;
+    }
+    
+    @Override
+    public void run() {
+        pen.writeWithPenAndPaper(paper);  // Locks pen, waits for paper
+    }
+}
+
+class Task2 implements Runnable {
+    private Pen pen;
+    private Paper paper;
+    
+    public Task2(Pen pen, Paper paper) {
+        this.pen = pen;
+        this.paper = paper;
+    }
+    
+    @Override
+    public void run() {
+        paper.writeWithPaperAndPen(pen);  // Locks paper, waits for pen → DEADLOCK!
+    }
+}
+
+public class DeadLockExample {
+    public static void main(String[] args) {
+        Pen pen = new Pen();
+        Paper paper = new Paper();
+        
+        Thread thread1 = new Thread(new Task1(pen, paper), "Thread-1");
+        Thread thread2 = new Thread(new Task2(pen, paper), "Thread-2");
+        
+        thread1.start();
+        thread2.start();
+    }
+}
+```
+
+### Deadlock Scenario:
+```
+Thread1: Locks Pen → Waits for Paper
+           ↓
+Thread2: Locks Paper → Waits for Pen
+           ↑
+        DEADLOCK!
+```
+
+### Prevention Methods:
+
+#### 1. Ordered Lock Acquisition
+```typescript
+class Task2 implements Runnable {
+    private Pen pen;
+    private Paper paper;
+    
+    @Override
+    public void run() {
+        // Always acquire locks in same order
+        synchronized(pen) {
+            paper.writeWithPaperAndPen(pen);  // No deadlock
+        }
+    }
+}
+```
+
+#### 2. Lock Timeout
+```typescript
+if(lock1.tryLock(1000, TimeUnit.MILLISECONDS)) {
+    try {
+        if(lock2.tryLock(1000, TimeUnit.MILLISECONDS)) {
+            // Proceed
+        }
+    } finally {
+        lock2.unlock();
+    }
+} finally {
+    lock1.unlock();
+}
+```
+
+#### 3. Avoid Nested Locks
+Minimize the use of nested synchronized blocks.
+
+#### 4. Use Specific Lock Objects
+Instead of locking `this`, use specific objects.
+
+**Deadlock Prevention Strategies:**
+- **Hold and Wait** - Acquire all locks at once
+- **No Preemption** - Use tryLock() with timeout
+- **Circular Wait** - Enforce lock ordering
+- **Mutual Exclusion** - Not preventable in most cases
+
+---
+
+## Executor Framework
+
+### What is Executor Framework?
+A high-level abstraction for managing threads and executing tasks efficiently. Introduced in Java 5 as part of `java.util.concurrent`.
+
+### Components:
+
+1. **Executor** - Core interface for executing tasks
+2. **ExecutorService** - Extended interface with lifecycle management
+3. **ThreadPoolExecutor** - Implementation managing pool of threads
+4. **ScheduledExecutorService** - For scheduling tasks
+5. **Executors** - Utility class with factory methods
+6. **Future** - Represents async computation result
+7. **Callable** - Task that returns a value
+
+### Code Example:
+```typescript
+public class ExecutorFramework {
+    public static void main(String[] args) {
+        // Without Executor Framework
+        long startTime = System.currentTimeMillis();
+        Thread[] threads = new Thread[10];
+        for (int i = 0; i < 10; i++) {
+            int finalI = i;
+            threads[i] = new Thread(() -> {
+                long result = factorial(finalI);
+                System.out.println("Factorial of " + finalI + " is: " + result);
+            });
+            threads[i].start();
+        }
+        
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        System.out.println("Time without Framework: " + (System.currentTimeMillis() - startTime) + " ms");
+        
+        // With Executor Framework
+        startTime = System.currentTimeMillis();
+        ExecutorService executorService = Executors.newFixedThreadPool(9);
+        for (int i = 0; i < 10; i++) {
+            int finalI = i;
+            executorService.submit(() -> {
+                long result = factorial(finalI);
+                System.out.println("Factorial of " + finalI + " is: " + result);
+            });
+        }
+        executorService.shutdown();
+        while (!executorService.isTerminated()) {
+            // Wait for completion
+        }
+        System.out.println("Time with Framework: " + (System.currentTimeMillis() - startTime) + " ms");
+    }
+    
+    static long factorial(long n) {
+        if (n <= 1) return 1;
+        return n * factorial(n - 1);
+    }
+}
+```
+
+### Types of ExecutorService:
+
+#### 1. FixedThreadPool
+```typescript
+ExecutorService executor = Executors.newFixedThreadPool(5);
+```
+- Fixed number of threads
+- Reuses threads from pool
+- Good for known workload
+
+#### 2. CachedThreadPool
+```typescript
+ExecutorService executor = Executors.newCachedThreadPool();
+```
+- Creates threads as needed
+- Reuses idle threads
+- Good for short-lived tasks
+
+#### 3. SingleThreadExecutor
+```typescript
+ExecutorService executor = Executors.newSingleThreadExecutor();
+```
+- Single worker thread
+- Executes tasks sequentially
+- Ensures single-threaded execution
+
+#### 4. ScheduledExecutorService
+```typescript
+public class ScheduledExecutorServiceExample {
+    public static void main(String[] args) {
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        
+        // Schedule task after delay
+        scheduler.schedule(
+            () -> System.out.println("Task executed after delay"), 
+            5, TimeUnit.SECONDS);
+        
+        // Schedule at fixed rate
+        scheduler.scheduleAtFixedRate(
+            () -> System.out.println("Executes every 5 seconds!"), 
+            5, 5, TimeUnit.SECONDS);
+        
+        // Schedule with fixed delay
+        scheduler.scheduleWithFixedDelay(
+            () -> System.out.println("Fixed delay execution"), 
+            0, 60, TimeUnit.SECONDS);
+        
+        // Shutdown after delay
+        scheduler.schedule(() -> {
+            scheduler.shutdown();
+            System.out.println("Scheduler shut down");
+        }, 20, TimeUnit.SECONDS);
+    }
+}
+```
+
+### Using ExecutorService:
+
+#### execute() - Fire and forget
+```typescript
+executorService.execute(() -> System.out.println("Task executed"));
+```
+
+#### submit() - Returns Future
+```typescript
+Future<?> future = executorService.submit(() -> System.out.println("Task"));
+System.out.println(future.isDone());
+```
+
+#### invokeAll() - Submit multiple Callables
+```typescript
+List<Callable<Integer>> tasks = Arrays.asList(
+    () -> factorial(5),
+    () -> factorial(6),
+    () -> factorial(7)
+);
+List<Future<Integer>> results = executorService.invokeAll(tasks);
+```
+
+**Benefits of Executor Framework:**
+- Thread pooling reduces overhead
+- Better resource management
+- Cleaner code
+- Built-in scheduling support
+- Task cancellation support
+
+---
+
+## Asynchronous Programming
+
+### CompletableFuture
+Introduced in Java 8 for easier asynchronous and functional programming.
+
+```typescript
+public class CompletableFutureExample {
+    public static void main(String[] args) {
+        // Create async computation
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                System.out.println("Task interrupted");
+            }
+            return "Hello, World!";
+        });
+        
+        // Wait and get result
+        String result = future.join();  // Blocks until complete
+        System.out.println("Result: " + result);
+        
+        // Alternative methods
+        try {
+            result = future.get();  // Also blocks
+            System.out.println("Result using get(): " + result);
+            
+            result = future.getNow("default");  // Non-blocking
+            System.out.println("Result using getNow(): " + result);
+            
+            result = future.get(3, TimeUnit.SECONDS);  // With timeout
+            System.out.println("Result with timeout: " + result);
+            
+            CompletableFuture.allOf().thenApply(v -> "All tasks completed").get();
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+**Key Features:**
+- `supplyAsync()` - Execute async task
+- `join()` - Block and wait for result
+- `get()` - Block with exception handling
+- `getNow()` - Non-blocking, returns default if not ready
+- `allOf()` - Combine multiple futures
+- `thenApply()` - Chain operations
+- `thenAccept()` - Consume result
+- `exceptionally()` - Handle exceptions
+
+---
+
+## Volatile vs Atomic
+
+### Volatile Keyword
+Ensures visibility of changes across threads but NOT atomicity.
+
+```typescript
+class Shared {
+    private volatile boolean flag = false;  // Visible to all threads
+    
+    public void setFlagTrue() {
+        System.out.println("Setting flag to true");
+        flag = true;
+    }
+    
+    public void printIfFlagTrue() {
+        while (!flag) {
+            // Busy-wait - volatile ensures we see updated value
+        }
+        System.out.println("Flag is true!");
+    }
+}
+
+public class VolatileVsAtomic {
+    public static void main(String[] args) {
+        Shared shared = new Shared();
+        
+        Thread writerThread = new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            shared.setFlagTrue();
+        });
+        
+        Thread readerThread = new Thread(() -> {
+            shared.printIfFlagTrue();
+        });
+        
+        readerThread.start();
+        writerThread.start();
+    }
+}
+```
+
+### Atomic Classes
+Provides atomic operations with both visibility and atomicity.
+
+```typescript
+class Counter {
+    private AtomicInteger counter = new AtomicInteger(0);
+    
+    public void increment() {
+        counter.incrementAndGet();  // Atomic increment
+    }
+    
+    public int getValue() {
+        return counter.get();
+    }
+}
+
+public class VolatileVsAtomic {
+    public static void main(String[] args) {
+        Counter counter = new Counter();
+        
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                counter.increment();
+            }
+        });
+        
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                counter.increment();
+            }
+        });
+        
+        t1.start();
+        t2.start();
+        
+        try {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        System.out.println("Final Counter Value: " + counter.getValue());  // 2000
+    }
+}
+```
+
+**Comparison:**
+| Feature | Volatile | Atomic |
+|---------|----------|--------|
+| Visibility | Yes | Yes |
+| Atomicity | No | Yes |
+| Performance | High | Slightly Lower |
+| Use Case | Flags, simple vars | Counters, complex ops |
+| Thread Safety | Partial | Complete |
+
+**Common Atomic Classes:**
+- `AtomicInteger` - Atomic int
+- `AtomicLong` - Atomic long
+- `AtomicBoolean` - Atomic boolean
+- `AtomicReference<T>` - Atomic object reference
+- `AtomicIntegerArray` - Atomic array of ints
+
+---
+
+## Thread Communication
+
+### Problem
+How do threads communicate and coordinate execution?
+
+### Solution: wait(), notify(), notifyAll()
+Used for inter-thread communication through shared object monitors.
+
+### Code Example:
+```typescript
+class SharedResource {
+    private int data;
+    private boolean hasData;
+    
+    public synchronized void produce(int value) {
+        while(hasData) {
+            try {
+                wait();  // Release lock and wait
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        data = value;
+        hasData = true;
+        System.out.println("Data Produced");
+        notify();  // Wake up one waiting thread
+    }
+    
+    public synchronized int consume() {
+        while(!hasData) {
+            try {
+                wait();  // Release lock and wait
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        hasData = false;
+        System.out.println("Data Consumed");
+        notify();  // Wake up one waiting thread
+        return data;
+    }
+}
+
+class Producer implements Runnable {
+    private SharedResource resource;
+    
+    public Producer(SharedResource resource) {
+        this.resource = resource;
+    }
+    
+    @Override
+    public void run() {
+        for(int i = 0; i < 10; i++) {
+            resource.produce(i);
+        }
+    }
+}
+
+class Consumer implements Runnable {
+    private SharedResource resource;
+    
+    public Consumer(SharedResource resource) {
+        this.resource = resource;
+    }
+    
+    @Override
+    public void run() {
+        for(int i = 0; i < 10; i++) {
+            int value = resource.consume();
+        }
+    }
+}
+
+public class ThreadCommunicationExample {
+    public static void main(String[] args) {
+        SharedResource resource = new SharedResource();
+        
+        Thread producerThread = new Thread(new Producer(resource));
+        Thread consumerThread = new Thread(new Consumer(resource));
+        
+        producerThread.start();
+        consumerThread.start();
+    }
+}
+```
+
+### Methods:
+
+#### wait()
+```typescript
+synchronized(obj) {
+    while(!condition) {
+        obj.wait();  // Release lock, wait for notify
+    }
+    // Proceed when notified
+}
+```
+- Releases lock and waits for notification
+- Must be called from synchronized context
+- Throws `InterruptedException`
+
+#### notify()
+```typescript
+synchronized(obj) {
+    // Update shared state
+    obj.notify();  // Wake one waiting thread
+}
+```
+- Wakes one thread from wait queue
+- Does NOT release lock immediately
+- Only effective if called from synchronized context
+
+#### notifyAll()
+```typescript
+synchronized(obj) {
+    obj.notifyAll();  // Wake all waiting threads
+}
+```
+- Wakes all threads from wait queue
+- Used when multiple threads are waiting
+
+### Producer-Consumer Pattern:
+This is the classic use case for thread communication.
+
+```
+Producer:
+  1. Check if data exists
+  2. If yes, wait() for consumer to consume
+  3. Produce data
+  4. notify() consumer
+  5. Repeat
+
+Consumer:
+  1. Check if data exists
+  2. If no, wait() for producer
+  3. Consume data
+  4. notify() producer
+  5. Repeat
+```
+
+**Key Points:**
+- Always check condition in while loop (not if)
+- Always call notify() when done
+- Use notifyAll() when multiple consumers/producers
+- Improves performance vs busy-waiting
+
+---
+
+## Summary of Key Concepts
+
+### Thread Creation
+- **Thread class** - Direct inheritance
+- **Runnable interface** - Preferred approach
+
+### Thread Management
+- **start()** vs **run()** - Always call start()
+- **Thread states** - NEW, RUNNABLE, RUNNING, BLOCKED, TERMINATED
+- **Thread types** - User threads vs Daemon threads
+
+### Synchronization Techniques
+1. **Synchronized keyword** - Intrinsic locks
+2. **Locks** - ReentrantLock, ReadWriteLock
+3. **Synchronization utilities** - CountDownLatch, CyclicBarrier
+4. **Thread communication** - wait(), notify()
+
+### Deadlock Prevention
+- Ordered lock acquisition
+- Lock timeouts
+- Avoid nested locks
+
+### High-Level APIs
+- **Executor Framework** - Manage thread pools
+- **CompletableFuture** - Asynchronous programming
+- **Atomic classes** - Atomic operations
+
+### Best Practices
+✓ Use Runnable over Thread class  
+✓ Use Executor Framework for thread management  
+✓ Prefer CompletableFuture for async tasks  
+✓ Use volatile for simple flags  
+✓ Use Atomic classes for counters  
+✓ Always handle InterruptedException  
+✓ Use locks instead of synchronized for complex scenarios  
+✓ Always release locks in finally blocks  
+✓ Avoid busy-waiting  
+✓ Always call shutdown() on ExecutorService  
+
+---
+
+## Interview Tips
+
+1. **Explain the difference between synchronized and Lock**
+   - Synchronized: Built-in, automatic, simpler
+   - Lock: More control, timeout support, fairness
+
+2. **Why use Executor Framework?**
+   - Thread pooling reduces overhead
+   - Better resource management
+   - Cleaner code abstraction
+
+3. **How to avoid deadlocks?**
+   - Acquire locks in same order
+   - Use timeouts
+   - Minimize lock scope
+
+4. **volatile vs synchronized?**
+   - volatile: Visibility only, no atomicity
+   - synchronized: Atomicity + visibility
+
+5. **CountDownLatch vs CyclicBarrier?**
+   - CountDownLatch: One-way, not reusable
+   - CyclicBarrier: Reusable, bidirectional
+
+---
+
+## Quick Reference
+
+### Creating Threads
+```typescript
+// Method 1
+Thread t = new MyThread();
+t.start();
+
+// Method 2
+Thread t = new Thread(() -> System.out.println("Running"));
+t.start();
+```
+
+### Common Methods
+```typescript
+thread.start();           // Start thread
+thread.join();            // Wait for completion
+thread.interrupt();       // Interrupt thread
+thread.setPriority(10);   // Set priority
+Thread.sleep(1000);       // Current thread sleep
+Thread.yield();           // Yield to others
+```
+
+### Synchronization
+```typescript
+// Method 1: Synchronized method
+public synchronized void method() { }
+
+// Method 2: Synchronized block
+synchronized(lock) { }
+
+// Method 3: Lock
+Lock lock = new ReentrantLock();
+lock.lock();
+try { } finally { lock.unlock(); }
+```
+
+### Executor Framework
+```typescript
+ExecutorService exec = Executors.newFixedThreadPool(10);
+exec.submit(() -> System.out.println("Task"));
+exec.shutdown();
+```
+
+---
+
+**Last Updated:** December 2024  
+**Package:** `com.java.interview.multithreading`
