@@ -1,0 +1,859 @@
+---
+title: Generative AI - Complete Learning Path
+description: Welcome to your comprehensive guide for mastering Generative AI. This documentation covers everything from foundational concepts to production-ready implementations across the entire AI ecosystem.
+icon: Sparkles
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+import { Card, Cards } from "fumadocs-ui/components/card";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { Step, Steps } from "fumadocs-ui/components/steps";
+
+
+<Callout type="info" title="Complete Technology Stack">
+  This guide covers **50+ technologies, frameworks, and tools** essential for
+  building modern Generative AI applications - from embeddings and vector
+  databases to LLMs, fine-tuning, and deployment.
+</Callout>
+
+---
+
+## What is Generative AI?
+
+Generative AI encompasses AI systems that create new content—text, images, code, audio, video, or structured data—based on learned patterns. Unlike traditional AI (classification/prediction), generative models produce novel, creative outputs.
+
+### Core Capabilities
+
+- 🎨 **Content Creation** - Text, images, code, audio, video
+- 💬 **Conversational AI** - Context-aware chatbots and assistants
+- 🔍 **Semantic Search** - Understanding meaning beyond keywords
+- 📊 **Data Analysis** - Extract insights from unstructured data
+- 🔄 **Translation & Transformation** - Content adaptation and reformatting
+- 🧠 **Reasoning & Planning** - Multi-step problem solving
+
+---
+
+## Complete Technology Ecosystem
+
+### 🤖 Large Language Models (LLMs)
+
+<Tabs items={['Commercial', 'Open Source', 'Specialized']}>
+<Tab value="Commercial">
+
+| Model                 | Provider  | Context     | Best For                    |
+| --------------------- | --------- | ----------- | --------------------------- |
+| **GPT-4 Turbo**       | OpenAI    | 128K tokens | General tasks, reasoning    |
+| **GPT-4o**            | OpenAI    | 128K tokens | Multimodal (text, vision)   |
+| **Claude 3.5 Sonnet** | Anthropic | 200K tokens | Long context, analysis      |
+| **Claude 3 Opus**     | Anthropic | 200K tokens | Complex reasoning           |
+| **Gemini 1.5 Pro**    | Google    | 1M tokens   | Massive context, multimodal |
+| **Command R+**        | Cohere    | 128K tokens | RAG, enterprise search      |
+
+</Tab>
+
+<Tab value="Open Source">
+
+| Model            | Size     | Context | Best For                     |
+| ---------------- | -------- | ------- | ---------------------------- |
+| **Llama 3.1**    | 8B-405B  | 128K    | General purpose, fine-tuning |
+| **Mixtral 8x7B** | 47B      | 32K     | Efficient, MOE architecture  |
+| **Mistral 7B**   | 7B       | 8K      | Fast inference, on-device    |
+| **Phi-3**        | 3.8B-14B | 128K    | Small, efficient models      |
+| **Qwen 2.5**     | 7B-72B   | 128K    | Multilingual, coding         |
+| **DeepSeek-V2**  | 236B     | 128K    | Cost-efficient, reasoning    |
+| **Yi-34B**       | 34B      | 200K    | Long context                 |
+
+</Tab>
+
+<Tab value="Specialized">
+
+| Model                   | Purpose          | Provider     |
+| ----------------------- | ---------------- | ------------ |
+| **Codex / GPT-4**       | Code generation  | OpenAI       |
+| **Code Llama**          | Code completion  | Meta         |
+| **StarCoder 2**         | Code generation  | Hugging Face |
+| **Whisper**             | Speech-to-text   | OpenAI       |
+| **DALL-E 3**            | Image generation | OpenAI       |
+| **Stable Diffusion XL** | Image generation | Stability AI |
+| **Midjourney**          | Image generation | Midjourney   |
+
+</Tab>
+</Tabs>
+
+---
+
+### 🗄️ Vector Databases
+
+Essential for semantic search and RAG systems:
+
+<Cards>
+  <Card
+    title="Pinecone"
+    description="Managed vector database with serverless option. Best for: Production RAG systems, 1B+ vectors"
+  >
+    - **Features**: Serverless, metadata filtering, hybrid search 
+    - **Scale**: Billions of vectors 
+    - **Pricing**: Pay-as-you-go
+  </Card>
+
+  <Card
+    title="Weaviate"
+    description="Open-source with hybrid search. Best for: Self-hosted, GraphQL queries"
+  >
+    - **Features**: Multi-modal, modules ecosystem 
+    - **Deployment**: Cloud or self-hosted 
+    - **Best for**: Flexible schemas
+  </Card>
+
+  <Card
+    title="Qdrant"
+    description="High-performance written in Rust. Best for: Speed-critical applications"
+  >
+    - **Features**: Payload filtering, collections 
+    - **Performance**: Ultra-fast queries 
+    - **Best for**: Real-time search
+  </Card>
+
+  <Card
+    title="Milvus"
+    description="Distributed, highly scalable. Best for: Large-scale enterprise"
+  >
+    - **Features**: GPU acceleration, sharding 
+    - **Scale**: Trillion-scale vectors 
+    - **Best for**: Big data scenarios
+  </Card>
+
+  <Card
+    title="Chroma"
+    description="Simple, embedded. Best for: Prototyping, small projects"
+  >
+    - **Features**: Easy setup, Python-first 
+    - **Deployment**: Embedded or server 
+    - **Best for**: Getting started quickly
+  </Card>
+
+  <Card
+    title="OpenSearch"
+    description="Full-text + vector search. Best for: Hybrid search needs"
+  >
+    - **Features**: Elasticsearch fork, k-NN plugin 
+    - **Integration**: AWS, self-hosted 
+    - **Best for**: Combined keyword + semantic
+  </Card>
+</Cards>
+
+**Other Notable Options:**
+
+- **pgvector** - PostgreSQL extension for vectors
+- **Redis Vector Search** - In-memory vector search
+- **Elasticsearch** - k-NN plugin for vector search
+- **FAISS** - Facebook's similarity search library
+- **LanceDB** - Embedded vector database
+
+---
+
+### 🔤 Embedding Models
+
+Transform text into vector representations:
+
+| Model                      | Provider              | Dimensions        | Best For                   |
+| -------------------------- | --------------------- | ----------------- | -------------------------- |
+| **text-embedding-3-large** | OpenAI                | 3072 (adjustable) | High accuracy, general use |
+| **text-embedding-3-small** | OpenAI                | 1536              | Cost-efficient             |
+| **text-embedding-ada-002** | OpenAI                | 1536              | Legacy, widely supported   |
+| **Cohere Embed v3**        | Cohere                | 1024              | Multilingual, compression  |
+| **Voyage AI**              | Voyage                | 1024              | Domain-specific fine-tuned |
+| **BGE-Large**              | BAAI                  | 1024              | Open-source, MTEB leader   |
+| **E5-Mistral-7B**          | Microsoft             | 4096              | Instruction-following      |
+| **all-MiniLM-L6-v2**       | Sentence-Transformers | 384               | Fast, lightweight          |
+| **UAE-Large-V1**           | WhereIsAI             | 1024              | General purpose            |
+
+**Specialized Embeddings:**
+
+- **Nomic Embed** - Long context (8K tokens)
+- **Jina Embeddings v2** - 8K context window
+- **Instructor** - Task-specific instructions
+
+---
+
+### 🧰 RAG & LLM Frameworks
+
+<Tabs items={['Python', 'TypeScript', 'Multi-Language']}>
+<Tab value="Python">
+
+**LangChain** (Most Popular)
+
+```python
+from langchain.chains import RetrievalQA
+from langchain.vectorstores import Pinecone
+from langchain.llms import OpenAI
+
+# Build RAG chain
+qa = RetrievalQA.from_chain_type(
+    llm=OpenAI(),
+    retriever=vectorstore.as_retriever()
+)
+```
+
+**LlamaIndex** (Data-Focused)
+
+```python
+from llama_index import VectorStoreIndex, ServiceContext
+from llama_index.vector_stores import PineconeVectorStore
+
+# Create index
+index = VectorStoreIndex.from_vector_store(
+    vector_store=PineconeVectorStore(...)
+)
+```
+
+**Haystack** (Production-Ready)
+
+```python
+from haystack import Pipeline
+from haystack.nodes import EmbeddingRetriever, PromptNode
+
+# Build pipeline
+pipeline = Pipeline()
+pipeline.add_node(component=retriever, name="Retriever")
+pipeline.add_node(component=prompt_node, name="Generator")
+```
+
+**Other Python Frameworks:**
+
+- **AutoGPT** - Autonomous agents
+- **BabyAGI** - Task-driven agents
+- **Semantic Kernel** - Microsoft's framework
+- **txtai** - Semantic search
+
+</Tab>
+
+<Tab value="TypeScript">
+
+**LangChain.js**
+
+```typescript
+import { RetrievalQAChain } from "langchain/chains";
+import { OpenAI } from "langchain/llms/openai";
+
+const chain = RetrievalQAChain.fromLLM(new OpenAI(), retriever);
+```
+
+**LlamaIndex.TS**
+
+```typescript
+import { VectorStoreIndex } from "llamaindex";
+
+const index = await VectorStoreIndex.fromDocuments(documents);
+```
+
+**Vercel AI SDK**
+
+```typescript
+import { OpenAIStream, StreamingTextResponse } from "ai";
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+  const response = await openai.chat.completions.create({
+    model: "gpt-4",
+    stream: true,
+    messages,
+  });
+  return new StreamingTextResponse(OpenAIStream(response));
+}
+```
+
+**Other TypeScript Options:**
+
+- **Transformers.js** - Run models in browser
+- **Langbase** - AI infrastructure
+- **Instructor.js** - Structured outputs
+
+</Tab>
+
+<Tab value="Multi-Language">
+
+**Semantic Kernel** (C#, Python, Java)
+
+- Microsoft's cross-platform framework
+- Plugin architecture
+- Memory and planning
+
+**Spring AI** (Java)
+
+- Spring Boot integration
+- Vector stores, embeddings
+- Chat models abstraction
+
+**Candle** (Rust)
+
+- ML framework from Hugging Face
+- Fast inference
+- WASM support
+
+**Go Libraries:**
+
+- **langchaingo** - LangChain for Go
+- **go-gpt3** - OpenAI bindings
+
+</Tab>
+</Tabs>
+
+---
+
+### 🛠️ Development Tools
+
+#### Model Serving & Inference
+
+<Cards>
+  <Card title="Ollama" description="Run LLMs locally with simple CLI">
+    ```bash ollama run llama3.1 ``` - 50+ models available - REST API included -
+    GPU acceleration
+  </Card>
+
+  <Card title="vLLM" description="High-throughput LLM serving">
+    - PagedAttention optimization - Continuous batching - OpenAI-compatible API
+  </Card>
+
+  <Card title="LM Studio" description="Desktop app for local LLMs">
+    - User-friendly interface - Model discovery - ChatGPT-like experience
+  </Card>
+
+  <Card
+    title="Text Generation Inference"
+    description="Hugging Face's production server"
+  >
+    - Optimized for HF models - Tensor parallelism - Flash attention
+  </Card>
+</Cards>
+
+**Other Serving Solutions:**
+
+- **LocalAI** - OpenAI-compatible API for local models
+- **Triton Inference Server** - NVIDIA's model server
+- **TensorRT-LLM** - Optimized LLM inference
+- **llama.cpp** - Efficient C++ implementation
+
+#### Prompt Engineering Tools
+
+- **Langfuse** - LLM observability and analytics
+- **PromptLayer** - Prompt version control
+- **Helicone** - Observability platform
+- **Weights & Biases** - Experiment tracking
+- **Phoenix** (Arize AI) - Observability and evaluation
+- **Portkey** - LLM gateway and monitoring
+
+#### Testing & Evaluation
+
+- **DeepEval** - LLM evaluation framework
+- **Ragas** - RAG assessment
+- **TruLens** - Feedback functions for LLMs
+- **UpTrain** - Evaluate and improve LLM applications
+- **LangSmith** - LangChain's testing platform
+
+---
+
+### 📚 Content Management & Data Sources
+
+<Tabs items={['CMS', 'Data Sources', 'Document Processing']}>
+<Tab value="CMS">
+
+**Headless CMS Options:**
+
+- **Sanity.io** - Flexible, real-time, GraphQL
+- **Contentful** - Enterprise-grade
+- **Strapi** - Open-source, self-hosted
+- **Directus** - Database-first CMS
+- **Payload CMS** - Code-first CMS
+
+**Knowledge Bases:**
+
+- **Notion** - Collaborative workspace
+- **Confluence** - Enterprise wiki
+- **GitBook** - Documentation platform
+
+</Tab>
+
+<Tab value="Data Sources">
+
+**Document Loaders:**
+
+- **Unstructured** - PDF, Word, HTML parsing
+- **PyMuPDF** - PDF extraction
+- **Apache Tika** - Universal document parser
+- **pdf2image** - PDF to images
+- **BeautifulSoup** - Web scraping
+
+**Data Connectors:**
+
+- **Firecrawl** - Web scraping API
+- **Apify** - Web automation
+- **Scrapy** - Python scraping framework
+- **Playwright** - Browser automation
+
+</Tab>
+
+<Tab value="Document Processing">
+
+**Text Processing:**
+
+- **spaCy** - NLP library
+- **NLTK** - Natural language toolkit
+- **tiktoken** - OpenAI tokenizer
+- **transformers** - Hugging Face library
+
+**Chunking Strategies:**
+
+- **RecursiveCharacterTextSplitter** (LangChain)
+- **SemanticChunker** - Meaning-based splitting
+- **TokenTextSplitter** - Token-aware chunking
+- **SentenceTransformers** - Sentence embeddings
+
+</Tab>
+</Tabs>
+
+---
+
+### 🚀 Deployment & Infrastructure
+
+#### Cloud Platforms
+
+<Cards>
+  <Card title="AWS" description="Comprehensive AI services">
+    - **SageMaker** - ML platform 
+    - **Bedrock** - Managed LLM access 
+    - **OpenSearch** - Vector search 
+    - **Lambda** - Serverless functions
+  </Card>
+
+  <Card title="Google Cloud" description="Vertex AI ecosystem">
+    - **Vertex AI** - Unified ML platform 
+    - **PaLM API** - Google's LLMs
+    - **Vector Search** - Managed service
+  </Card>
+
+  <Card title="Azure" description="OpenAI partnership">
+    - **Azure OpenAI** - GPT-4, DALL-E 
+    - **Cognitive Search** - AI-powered search 
+    - **ML Studio** - Model training
+  </Card>
+
+  <Card title="Specialized" description="AI-focused platforms">
+    - **Modal** - Serverless for ML 
+    - **Replicate** - Run ML models via API 
+    - **Banana** - GPU hosting 
+    - **RunPod** - GPU cloud
+  </Card>
+</Cards>
+
+#### Container & Orchestration
+
+- **Docker** - Containerization
+- **Kubernetes** - Orchestration
+- **Ray** - Distributed computing
+- **Prefect** - Workflow orchestration
+- **Airflow** - Pipeline management
+
+---
+
+### 🎨 Fine-Tuning & Training
+
+<Tabs items={['Methods', 'Tools', 'Techniques']}>
+<Tab value="Methods">
+
+**Fine-Tuning Approaches:**
+
+1. **Full Fine-Tuning**
+
+   - Update all model parameters
+   - Requires significant compute
+   - Best results but expensive
+
+2. **LoRA (Low-Rank Adaptation)**
+
+   - Efficient fine-tuning
+   - Only train small matrices
+   - 90% less memory
+
+3. **QLoRA (Quantized LoRA)**
+
+   - LoRA + 4-bit quantization
+   - Fine-tune on consumer GPUs
+   - Minimal quality loss
+
+4. **Prefix Tuning**
+
+   - Add trainable prefixes
+   - Freeze base model
+   - Task-specific adaptation
+
+5. **Prompt Tuning**
+   - Soft prompts only
+   - Minimal parameters
+   - Fast adaptation
+
+</Tab>
+
+<Tab value="Tools">
+
+**Training Frameworks:**
+
+- **Hugging Face Transformers** - Standard library
+- **PEFT** (Parameter-Efficient Fine-Tuning)
+- **Axolotl** - Streamlined fine-tuning
+- **LLaMA-Factory** - GUI + CLI for fine-tuning
+- **Unsloth** - 2x faster fine-tuning
+- **TRL** (Transformer Reinforcement Learning)
+
+**RLHF & Alignment:**
+
+- **RLHF** (Reinforcement Learning from Human Feedback)
+- **DPO** (Direct Preference Optimization)
+- **PPO** (Proximal Policy Optimization)
+- **ORPO** (Odds Ratio Preference Optimization)
+
+</Tab>
+
+<Tab value="Techniques">
+
+**Optimization Methods:**
+
+- **Mixed Precision Training** - FP16/BF16
+- **Gradient Checkpointing** - Reduce memory
+- **DeepSpeed** - Distributed training
+- **FSDP** (Fully Sharded Data Parallel)
+- **Flash Attention** - Faster attention
+- **xFormers** - Memory-efficient attention
+
+**Quantization:**
+
+- **GPTQ** - Post-training quantization
+- **AWQ** - Activation-aware quantization
+- **bitsandbytes** - 8-bit/4-bit inference
+- **GGUF/GGML** - llama.cpp format
+
+</Tab>
+</Tabs>
+
+---
+
+### 🔐 Security & Monitoring
+
+#### Security Tools
+
+- **LLM Guard** - Content filtering
+- **NeMo Guardrails** - NVIDIA's safety layer
+- **Rebuff** - Prompt injection detection
+- **Lakera** - LLM security platform
+- **Arthur Shield** - AI firewall
+
+#### Monitoring & Observability
+
+- **Langfuse** - Tracing and analytics
+- **Datadog** - Infrastructure monitoring
+- **New Relic** - Application monitoring
+- **Sentry** - Error tracking
+- **Arize** - ML observability
+
+---
+
+## Learning Path
+
+<Steps>
+
+### Phase 1: Foundations (2-4 weeks)
+
+**Core Concepts:**
+
+- Understand transformers architecture
+- Learn about attention mechanisms
+- Study embeddings and vector spaces
+- Explore tokenization
+
+**Hands-On:**
+
+```python
+# Start with OpenAI API
+from openai import OpenAI
+client = OpenAI()
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+```
+
+**Resources:**
+
+- Stanford CS224N (NLP)
+- Hugging Face Course
+- Fast.ai Practical Deep Learning
+
+### Phase 2: RAG Systems (3-6 weeks)
+
+**Build Your First RAG:**
+
+1. Set up vector database (Pinecone/Chroma)
+2. Generate embeddings
+3. Implement semantic search
+4. Connect to LLM for generation
+
+**Key Technologies:**
+
+- LangChain or LlamaIndex
+- OpenAI embeddings
+- Vector database of choice
+
+### Phase 3: Production (4-8 weeks)
+
+**Advanced Topics:**
+
+- Hybrid search (vector + keyword)
+- Caching and optimization
+- Streaming responses
+- Error handling and retries
+- Cost optimization
+
+**Deploy:**
+
+- Containerize with Docker
+- Set up monitoring
+- Implement rate limiting
+- Add security layers
+
+### Phase 4: Specialization (Ongoing)
+
+**Choose Your Path:**
+
+- 🎨 **Multimodal AI** - Vision, audio, video
+- 🔧 **Fine-Tuning** - Custom models
+- 🤖 **Agents** - Autonomous systems
+- 📊 **Enterprise RAG** - Scale and security
+- 🎯 **Domain-Specific** - Healthcare, finance, legal
+
+</Steps>
+
+---
+
+## Quick Start Templates
+
+### Minimal RAG System
+
+<Tabs items={['Python', 'TypeScript', 'Java']}>
+<Tab value="Python">
+```python
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import Chroma
+from langchain.chat_models import ChatOpenAI
+from langchain.chains import RetrievalQA
+
+# Setup
+
+embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+vectorstore = Chroma(embedding_function=embeddings)
+llm = ChatOpenAI(model="gpt-4")
+
+# Create RAG chain
+
+qa_chain = RetrievalQA.from_chain_type(
+llm=llm,
+retriever=vectorstore.as_retriever(search_kwargs={"k": 3})
+)
+
+# Query
+
+response = qa_chain.run("What are the key features?")
+
+````
+</Tab>
+
+<Tab value="TypeScript">
+```typescript
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { Chroma } from "langchain/vectorstores/chroma";
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { RetrievalQAChain } from "langchain/chains";
+
+const embeddings = new OpenAIEmbeddings({
+  modelName: "text-embedding-3-large"
+});
+
+const vectorStore = await Chroma.fromExistingCollection(
+  embeddings,
+  { collectionName: "documents" }
+);
+
+const model = new ChatOpenAI({ modelName: "gpt-4" });
+
+const chain = RetrievalQAChain.fromLLM(
+  model,
+  vectorStore.asRetriever(3)
+);
+
+const response = await chain.call({
+  query: "What are the key features?"
+});
+````
+
+</Tab>
+
+<Tab value="Java">
+```java
+import dev.langchain4j.model.openai.*;
+import dev.langchain4j.data.segment.*;
+import dev.langchain4j.store.embedding.*;
+
+// Setup OpenAI
+OpenAiChatModel model = OpenAiChatModel.builder()
+.apiKey(System.getenv("OPENAI_API_KEY"))
+.modelName("gpt-4")
+.build();
+
+OpenAiEmbeddingModel embeddingModel =
+OpenAiEmbeddingModel.builder()
+.apiKey(System.getenv("OPENAI_API_KEY"))
+.modelName("text-embedding-3-large")
+.build();
+
+// Create embeddings and store
+EmbeddingStore<TextSegment> embeddingStore =
+new InMemoryEmbeddingStore<>();
+
+// Query
+String response = model.generate("What are the key features?");
+
+```
+</Tab>
+</Tabs>
+
+---
+
+## Cost Optimization
+
+<Callout type="warn" title="Managing AI Costs">
+Generative AI can be expensive. Follow these strategies to optimize costs.
+</Callout>
+
+### Cost Comparison (per 1M tokens)
+
+| Model | Input | Output | Total (50/50) |
+|-------|-------|--------|---------------|
+| **GPT-4 Turbo** | $10 | $30 | $20 |
+| **GPT-3.5 Turbo** | $0.50 | $1.50 | $1 |
+| **Claude 3.5 Sonnet** | $3 | $15 | $9 |
+| **Claude 3 Haiku** | $0.25 | $1.25 | $0.75 |
+| **Gemini 1.5 Pro** | $1.25 | $5 | $3.13 |
+| **Llama 3.1 (self-hosted)** | ~$0.10 | ~$0.10 | ~$0.10 |
+
+### Optimization Strategies
+
+1. **Smart Model Selection**
+   - Use cheaper models for simple tasks
+   - Reserve GPT-4 for complex reasoning
+
+2. **Caching**
+   - Cache embeddings (OpenAI offers 50% discount)
+   - Cache frequent responses
+   - Use semantic caching
+
+3. **Prompt Optimization**
+   - Shorter, clearer prompts
+   - Reduce output tokens
+   - Use structured outputs
+
+4. **Self-Hosting**
+   - Run open-source models locally
+   - Use Ollama for development
+   - Consider LoRA fine-tuned models
+
+---
+
+## Best Practices
+
+### RAG Systems
+
+✅ **Chunk Intelligently** - 200-500 tokens, respect boundaries \
+✅ **Use Hybrid Search** - Combine vector + keyword \
+✅ **Filter Results** - Use metadata for precision \
+✅ **Rerank** - Use reranking models for top results \
+✅ **Context Management** - Stay within token limits
+
+### Production Deployment
+
+✅ **Monitor Everything** - Latency, costs, quality \
+✅ **Implement Fallbacks** - Handle API failures \
+✅ **Rate Limit** - Protect against abuse \
+✅ **Version Control** - Track prompt changes \
+✅ **Security** - Sanitize inputs, audit outputs
+
+### Development Workflow
+
+✅ **Start Simple** - MVP first, optimize later \
+✅ **Test Extensively** - Diverse queries and edge cases \
+✅ **Iterate Prompts** - Systematic prompt engineering \
+✅ **Measure Quality** - Use evaluation frameworks \
+✅ **Document Everything** - Prompts, configs, decisions
+
+---
+
+## Community & Resources
+
+### Essential Reading
+
+- **Papers:**
+  - "Attention Is All You Need" (Transformers)
+  - "Retrieval-Augmented Generation" (RAG)
+  - "LoRA: Low-Rank Adaptation" (Efficient Fine-Tuning)
+  - "LLaMA: Open and Efficient Foundation Language Models"
+
+- **Books:**
+  - "Building LLMs for Production" by Chip Huyen
+  - "Hands-On Large Language Models" by Jay Alammar
+
+### Communities
+
+- **Hugging Face** - Models, datasets, discussions
+- **LangChain Discord** - Active community
+- **r/LocalLLaMA** - Open-source models
+- **r/MachineLearning** - Research discussions
+- **AI Stack Devs** - Developer community
+
+### Newsletters & Blogs
+
+- **The Batch** (DeepLearning.AI)
+- **Import AI**
+- **Ahead of AI**
+- **LangChain Blog**
+- **OpenAI Blog**
+
+---
+
+## What's Next?
+
+<Cards>
+  <Card
+    title="RAG Implementation Guide"
+    description="Build production-ready RAG with Pinecone, OpenSearch, and OpenAI"
+    href="/generative-ai/rag-implementation"
+  />
+  <Card
+    title="Vector Databases Deep Dive"
+    description="Master semantic search with multiple vector database options"
+    href="/generative-ai/vector-databases"
+  />
+  <Card
+    title="Fine-Tuning Guide"
+    description="Customize models with LoRA, QLoRA, and full fine-tuning"
+    href="/generative-ai/fine-tuning"
+  />
+  <Card
+    title="Production Deployment"
+    description="Deploy, monitor, and scale your AI applications"
+    href="/generative-ai/deployment"
+  />
+</Cards>
+
+<Callout title="Ready to Build?">
+Start with our [RAG Implementation Guide](/generative-ai/rag-implementation) - includes complete code examples in Python, TypeScript, and Java!
+</Callout>
+```

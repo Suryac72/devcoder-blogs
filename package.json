@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "next build",
-    "dev": "next dev",
+    "dev": "node --max-old-space-size=8192 node_modules/next/dist/bin/next dev",
+    "build": "node --max-old-space-size=8192 node_modules/next/dist/bin/next build",
     "start": "next start",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",

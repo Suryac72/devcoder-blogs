@@ -1,0 +1,852 @@
+---
+title: RAG Implementation with Hybrid Search
+description: A comprehensive guide to building production-ready Retrieval-Augmented Generation (RAG) systems using Pinecone, OpenSearch, Sanity.io, and OpenAI.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Accordions, Accordion } from "fumadocs-ui/components/accordion";
+
+<Callout title="Tech Stack">
+**Pinecone** • Vector database (1024-dim) \
+**OpenSearch** • Full-text search \
+**Sanity.io** • Content CMS \
+**OpenAI** • Embeddings & LLM \
+</Callout>
+
+## Why Hybrid Search?
+
+Combining vector search with keyword search provides:
+- ✨ Better semantic understanding
+- 🎯 Precise term matching
+- 🔍 Metadata filtering
+- 📊 Improved relevance scoring
+
+---
+
+## Setup
+
+<Steps>
+
+### Install Dependencies
+
+<Tabs items={['Python', 'TypeScript', 'Java']}>
+<Tab value="Python">
+```bash
+pip install pinecone-client opensearch-py openai sanity python-dotenv
+```
+</Tab>
+
+<Tab value="TypeScript">
+```bash
+npm install @pinecone-database/pinecone @opensearch-project/opensearch openai @sanity/client
+```
+</Tab>
+
+<Tab value="Java">
+```xml
+<!-- Add to pom.xml -->
+<dependencies>
+    <dependency>
+        <groupId>io.pinecone</groupId>
+        <artifactId>pinecone-client</artifactId>
+        <version>1.0.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.opensearch.client</groupId>
+        <artifactId>opensearch-rest-high-level-client</artifactId>
+        <version>2.11.0</version>
+    </dependency>
+</dependencies>
+```
+</Tab>
+</Tabs>
+
+### Environment Variables
+
+```bash
+PINECONE_API_KEY=your_key
+OPENSEARCH_ENDPOINT=https://your-endpoint
+OPENSEARCH_USERNAME=admin
+OPENSEARCH_PASSWORD=your_password
+SANITY_PROJECT_ID=your_project
+SANITY_DATASET=production
+SANITY_TOKEN=your_token
+OPENAI_API_KEY=your_key
+```
+
+</Steps>
+
+---
+
+## Complete Implementation
+
+### 1. Initialize Clients
+
+<Tabs items={['Python', 'TypeScript', 'Java']}>
+<Tab value="Python">
+```python
+from pinecone import Pinecone, ServerlessSpec
+from opensearchpy import OpenSearch
+from openai import OpenAI
+from sanity import Client as SanityClient
+import os
+
+# Pinecone
+pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+if "surya-portfolio" not in pc.list_indexes().names():
+    pc.create_index(
+        name="surya-portfolio",
+        dimension=1024,
+        metric="cosine",
+        spec=ServerlessSpec(cloud="aws", region="us-east-1")
+    )
+pinecone_index = pc.Index("surya-portfolio")
+
+# OpenSearch
+opensearch = OpenSearch(
+    hosts=[os.getenv("OPENSEARCH_ENDPOINT")],
+    http_auth=(os.getenv("OPENSEARCH_USERNAME"), os.getenv("OPENSEARCH_PASSWORD")),
+    use_ssl=True
+)
+
+# Create index
+if not opensearch.indices.exists("portfolio"):
+    opensearch.indices.create(
+        index="portfolio",
+        body={
+            "mappings": {
+                "properties": {
+                    "text": {"type": "text"},
+                    "title": {"type": "text"},
+                    "type": {"type": "keyword"},
+                    "technologies": {"type": "keyword"}
+                }
+            }
+        }
+    )
+
+# OpenAI & Sanity
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+sanity = SanityClient(
+    project=os.getenv("SANITY_PROJECT_ID"),
+    dataset=os.getenv("SANITY_DATASET"),
+    token=os.getenv("SANITY_TOKEN")
+)
+```
+</Tab>
+
+<Tab value="TypeScript">
+```typescript
+import { Pinecone } from '@pinecone-database/pinecone';
+import { Client } from '@opensearch-project/opensearch';
+import OpenAI from 'openai';
+import { createClient } from '@sanity/client';
+
+const pinecone = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! });
+
+// Create index if needed
+const indexes = await pinecone.listIndexes();
+if (!indexes.indexes?.find(i => i.name === 'surya-portfolio')) {
+  await pinecone.createIndex({
+    name: 'surya-portfolio',
+    dimension: 1024,
+    metric: 'cosine',
+    spec: { serverless: { cloud: 'aws', region: 'us-east-1' } }
+  });
+}
+const index = pinecone.index('surya-portfolio');
+
+// OpenSearch
+const opensearch = new Client({
+  node: process.env.OPENSEARCH_ENDPOINT!,
+  auth: {
+    username: process.env.OPENSEARCH_USERNAME!,
+    password: process.env.OPENSEARCH_PASSWORD!
+  }
+});
+
+// Create index
+const exists = await opensearch.indices.exists({ index: 'portfolio' });
+if (!exists.body) {
+  await opensearch.indices.create({
+    index: 'portfolio',
+    body: {
+      mappings: {
+        properties: {
+          text: { type: 'text' },
+          title: { type: 'text' },
+          type: { type: 'keyword' },
+          technologies: { type: 'keyword' }
+        }
+      }
+    }
+  });
+}
+
+// OpenAI & Sanity
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+const sanity = createClient({
+  projectId: process.env.SANITY_PROJECT_ID!,
+  dataset: process.env.SANITY_DATASET!,
+  token: process.env.SANITY_TOKEN!
+});
+```
+</Tab>
+
+<Tab value="Java">
+```java
+import io.pinecone.*;
+import org.opensearch.client.*;
+import com.theokanning.openai.service.OpenAiService;
+
+public class RAGSystem {
+    PineconeClient pinecone;
+    RestHighLevelClient opensearch;
+    OpenAiService openai;
+    
+    public RAGSystem() {
+        // Pinecone
+        this.pinecone = new PineconeClient(
+            new PineconeClientConfig()
+                .withApiKey(System.getenv("PINECONE_API_KEY"))
+        );
+        
+        // OpenSearch
+        this.opensearch = new RestHighLevelClient(
+            RestClient.builder(
+                HttpHost.create(System.getenv("OPENSEARCH_ENDPOINT"))
+            )
+        );
+        
+        // OpenAI
+        this.openai = new OpenAiService(System.getenv("OPENAI_API_KEY"));
+    }
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+### 2. Fetch & Chunk Data
+
+<Tabs items={['Python', 'TypeScript', 'Java']}>
+<Tab value="Python">
+```python
+# Fetch from Sanity
+docs = sanity.fetch('''
+    *[_type in ["resume", "project", "experience"]] {
+        _id, title, description, content, technologies
+    }
+''')
+
+# Chunk documents
+def chunk_text(text, size=400, overlap=50):
+    words = text.split()
+    chunks = []
+    for i in range(0, len(words), size - overlap):
+        chunks.append(' '.join(words[i:i + size]))
+    return chunks
+
+chunked = []
+for doc in docs:
+    text = f"{doc.get('title', '')} {doc.get('content', '')}"
+    for idx, chunk in enumerate(chunk_text(text)):
+        chunked.append({
+            'id': f"{doc['_id']}_{idx}",
+            'text': chunk,
+            'metadata': {
+                'source_id': doc['_id'],
+                'title': doc.get('title', ''),
+                'type': doc['_type'],
+                'technologies': doc.get('technologies', [])
+            }
+        })
+
+print(f"Created {len(chunked)} chunks from {len(docs)} documents")
+```
+</Tab>
+
+<Tab value="TypeScript">
+```typescript
+// Fetch from Sanity
+const docs = await sanity.fetch(`
+    *[_type in ["resume", "project", "experience"]] {
+        _id, title, description, content, technologies
+    }
+`);
+
+// Chunk function
+function chunkText(text: string, size = 400, overlap = 50) {
+  const words = text.split(/\s+/);
+  const chunks: string[] = [];
+  for (let i = 0; i < words.length; i += size - overlap) {
+    chunks.push(words.slice(i, i + size).join(' '));
+  }
+  return chunks;
+}
+
+// Create chunks
+const chunked = docs.flatMap((doc, docIdx) => {
+  const text = `${doc.title || ''} ${doc.content || ''}`;
+  return chunkText(text).map((chunk, idx) => ({
+    id: `${doc._id}_${idx}`,
+    text: chunk,
+    metadata: {
+      source_id: doc._id,
+      title: doc.title || '',
+      type: doc._type,
+      technologies: doc.technologies || []
+    }
+  }));
+});
+
+console.log(`Created ${chunked.length} chunks from ${docs.length} documents`);
+```
+</Tab>
+
+<Tab value="Java">
+```java
+// Fetch from Sanity
+List<JsonNode> docs = fetchFromSanity();
+
+// Chunk method
+public List<String> chunkText(String text, int size, int overlap) {
+    String[] words = text.split("\\s+");
+    List<String> chunks = new ArrayList<>();
+    
+    for (int i = 0; i < words.length; i += size - overlap) {
+        int end = Math.min(i + size, words.length);
+        chunks.add(String.join(" ", 
+            Arrays.copyOfRange(words, i, end)));
+    }
+    return chunks;
+}
+
+// Process documents
+List<Chunk> chunked = new ArrayList<>();
+for (JsonNode doc : docs) {
+    String text = doc.get("title").asText() + " " + 
+                  doc.get("content").asText();
+    List<String> chunks = chunkText(text, 400, 50);
+    
+    for (int i = 0; i < chunks.size(); i++) {
+        chunked.add(new Chunk(
+            doc.get("_id").asText() + "_" + i,
+            chunks.get(i),
+            createMetadata(doc)
+        ));
+    }
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+### 3. Generate Embeddings & Ingest
+
+<Tabs items={['Python', 'TypeScript', 'Java']}>
+<Tab value="Python">
+```python
+# Generate embeddings
+texts = [c['text'] for c in chunked]
+response = openai_client.embeddings.create(
+    model="text-embedding-3-large",
+    input=texts,
+    dimensions=1024
+)
+embeddings = [item.embedding for item in response.data]
+
+# Ingest to Pinecone
+vectors = [
+    {
+        'id': c['id'],
+        'values': emb,
+        'metadata': {**c['metadata'], 'text': c['text'][:1000]}
+    }
+    for c, emb in zip(chunked, embeddings)
+]
+pinecone_index.upsert(vectors=vectors)
+
+# Ingest to OpenSearch
+from opensearchpy.helpers import bulk
+actions = [
+    {
+        '_index': 'portfolio',
+        '_id': c['id'],
+        '_source': {**c['metadata'], 'text': c['text']}
+    }
+    for c in chunked
+]
+bulk(opensearch, actions)
+
+print("✅ Ingestion complete!")
+```
+</Tab>
+
+<Tab value="TypeScript">
+```typescript
+// Generate embeddings
+const texts = chunked.map(c => c.text);
+const response = await openai.embeddings.create({
+  model: 'text-embedding-3-large',
+  input: texts,
+  dimensions: 1024
+});
+const embeddings = response.data.map(d => d.embedding);
+
+// Ingest to Pinecone
+await index.upsert(
+  chunked.map((c, i) => ({
+    id: c.id,
+    values: embeddings[i],
+    metadata: { ...c.metadata, text: c.text.substring(0, 1000) }
+  }))
+);
+
+// Ingest to OpenSearch
+const body = chunked.flatMap(c => [
+  { index: { _index: 'portfolio', _id: c.id } },
+  { ...c.metadata, text: c.text }
+]);
+await opensearch.bulk({ body });
+
+console.log('✅ Ingestion complete!');
+```
+</Tab>
+
+<Tab value="Java">
+```java
+// Generate embeddings
+List<String> texts = chunked.stream()
+    .map(c -> c.text)
+    .collect(Collectors.toList());
+
+EmbeddingResult result = openai.createEmbeddings(
+    EmbeddingRequest.builder()
+        .model("text-embedding-3-large")
+        .input(texts)
+        .dimensions(1024)
+        .build()
+);
+
+List<List<Double>> embeddings = result.getData().stream()
+    .map(e -> e.getEmbedding())
+    .collect(Collectors.toList());
+
+// Ingest to Pinecone
+List<Map<String, Object>> vectors = new ArrayList<>();
+for (int i = 0; i < chunked.size(); i++) {
+    Map<String, Object> vector = new HashMap<>();
+    vector.put("id", chunked.get(i).id);
+    vector.put("values", embeddings.get(i));
+    vector.put("metadata", chunked.get(i).metadata);
+    vectors.add(vector);
+}
+pinecone.upsert("surya-portfolio", vectors);
+
+// Ingest to OpenSearch
+BulkRequest bulk = new BulkRequest();
+for (Chunk c : chunked) {
+    bulk.add(new IndexRequest("portfolio")
+        .id(c.id)
+        .source(c.toMap(), XContentType.JSON));
+}
+opensearch.bulk(bulk, RequestOptions.DEFAULT);
+
+System.out.println("✅ Ingestion complete!");
+```
+</Tab>
+</Tabs>
+
+---
+
+### 4. Hybrid Search Query
+
+<Tabs items={['Python', 'TypeScript', 'Java']}>
+<Tab value="Python">
+```python
+def hybrid_search(query: str, top_k: int = 5):
+    # Generate query embedding
+    query_emb = openai_client.embeddings.create(
+        model="text-embedding-3-large",
+        input=[query],
+        dimensions=1024
+    ).data[0].embedding
+    
+    # Vector search (Pinecone)
+    vector_results = pinecone_index.query(
+        vector=query_emb,
+        top_k=top_k,
+        include_metadata=True
+    )
+    
+    # Keyword search (OpenSearch)
+    keyword_results = opensearch.search(
+        index="portfolio",
+        body={
+            "query": {
+                "multi_match": {
+                    "query": query,
+                    "fields": ["text", "title^2"]
+                }
+            },
+            "size": top_k
+        }
+    )
+    
+    # Combine results (simple fusion)
+    results = {}
+    for match in vector_results['matches']:
+        results[match['id']] = {
+            'text': match['metadata']['text'],
+            'score': match['score'],
+            'source': 'vector'
+        }
+    
+    for hit in keyword_results['hits']['hits']:
+        doc_id = hit['_id']
+        if doc_id in results:
+            results[doc_id]['score'] += hit['_score']
+        else:
+            results[doc_id] = {
+                'text': hit['_source']['text'],
+                'score': hit['_score'],
+                'source': 'keyword'
+            }
+    
+    # Sort by combined score
+    ranked = sorted(results.items(), 
+                   key=lambda x: x[1]['score'], 
+                   reverse=True)
+    return ranked[:top_k]
+
+# Test query
+results = hybrid_search("Python machine learning projects")
+for doc_id, data in results:
+    print(f"Score: {data['score']:.3f} | {data['text'][:100]}...")
+```
+</Tab>
+
+<Tab value="TypeScript">
+```typescript
+async function hybridSearch(query: string, topK = 5) {
+  // Generate query embedding
+  const response = await openai.embeddings.create({
+    model: 'text-embedding-3-large',
+    input: [query],
+    dimensions: 1024
+  });
+  const queryEmb = response.data[0].embedding;
+  
+  // Vector search
+  const vectorResults = await index.query({
+    vector: queryEmb,
+    topK,
+    includeMetadata: true
+  });
+  
+  // Keyword search
+  const keywordResults = await opensearch.search({
+    index: 'portfolio',
+    body: {
+      query: {
+        multi_match: {
+          query,
+          fields: ['text', 'title^2']
+        }
+      },
+      size: topK
+    }
+  });
+  
+  // Combine results
+  const results = new Map();
+  
+  vectorResults.matches?.forEach(match => {
+    results.set(match.id, {
+      text: match.metadata?.text,
+      score: match.score,
+      source: 'vector'
+    });
+  });
+  
+  keywordResults.body.hits.hits.forEach(hit => {
+    const existing = results.get(hit._id);
+    if (existing) {
+      existing.score += hit._score;
+    } else {
+      results.set(hit._id, {
+        text: hit._source.text,
+        score: hit._score,
+        source: 'keyword'
+      });
+    }
+  });
+  
+  // Sort and return
+  return Array.from(results.entries())
+    .sort((a, b) => b[1].score - a[1].score)
+    .slice(0, topK);
+}
+
+// Test
+const results = await hybridSearch('Python machine learning projects');
+results.forEach(([id, data]) => {
+  console.log(`Score: ${data.score.toFixed(3)} | ${data.text.substring(0, 100)}...`);
+});
+```
+</Tab>
+
+<Tab value="Java">
+```java
+public class SearchResult {
+    String id;
+    String text;
+    double score;
+    String source;
+}
+
+public List<SearchResult> hybridSearch(String query, int topK) {
+    // Generate query embedding
+    EmbeddingResult embResult = openai.createEmbeddings(
+        EmbeddingRequest.builder()
+            .model("text-embedding-3-large")
+            .input(List.of(query))
+            .dimensions(1024)
+            .build()
+    );
+    List<Double> queryEmb = embResult.getData().get(0).getEmbedding();
+    
+    // Vector search
+    QueryResponse vectorResults = pinecone.query(
+        "surya-portfolio",
+        QueryRequest.builder()
+            .vector(queryEmb)
+            .topK(topK)
+            .includeMetadata(true)
+            .build()
+    );
+    
+    // Keyword search
+    SearchRequest searchRequest = new SearchRequest("portfolio");
+    SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+    sourceBuilder.query(QueryBuilders.multiMatchQuery(query, "text", "title"));
+    sourceBuilder.size(topK);
+    searchRequest.source(sourceBuilder);
+    
+    SearchResponse keywordResults = opensearch.search(
+        searchRequest, RequestOptions.DEFAULT);
+    
+    // Combine results
+    Map<String, SearchResult> combined = new HashMap<>();
+    
+    for (Match match : vectorResults.getMatches()) {
+        SearchResult sr = new SearchResult();
+        sr.id = match.getId();
+        sr.text = (String) match.getMetadata().get("text");
+        sr.score = match.getScore();
+        sr.source = "vector";
+        combined.put(sr.id, sr);
+    }
+    
+    for (SearchHit hit : keywordResults.getHits()) {
+        String id = hit.getId();
+        if (combined.containsKey(id)) {
+            combined.get(id).score += hit.getScore();
+        } else {
+            SearchResult sr = new SearchResult();
+            sr.id = id;
+            sr.text = (String) hit.getSourceAsMap().get("text");
+            sr.score = hit.getScore();
+            sr.source = "keyword";
+            combined.put(id, sr);
+        }
+    }
+    
+    return combined.values().stream()
+        .sorted((a, b) -> Double.compare(b.score, a.score))
+        .limit(topK)
+        .collect(Collectors.toList());
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+### 5. Generate Response with LLM
+
+<Tabs items={['Python', 'TypeScript', 'Java']}>
+<Tab value="Python">
+```python
+def generate_response(query: str):
+    # Get relevant context
+    search_results = hybrid_search(query, top_k=3)
+    context = "\n\n".join([data['text'] for _, data in search_results])
+    
+    # Generate response
+    response = openai_client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant that answers questions based on the provided context."},
+            {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {query}"}
+        ]
+    )
+    
+    return response.choices[0].message.content
+
+# Test
+answer = generate_response("What Python projects have you worked on?")
+print(answer)
+```
+</Tab>
+
+<Tab value="TypeScript">
+```typescript
+async function generateResponse(query: string) {
+  const searchResults = await hybridSearch(query, 3);
+  const context = searchResults
+    .map(([_, data]) => data.text)
+    .join('\n\n');
+  
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a helpful assistant that answers questions based on the provided context.'
+      },
+      {
+        role: 'user',
+        content: `Context:\n${context}\n\nQuestion: ${query}`
+      }
+    ]
+  });
+  
+  return response.choices[0].message.content;
+}
+
+const answer = await generateResponse('What Python projects have you worked on?');
+console.log(answer);
+```
+</Tab>
+
+<Tab value="Java">
+```java
+public String generateResponse(String query) {
+    List<SearchResult> results = hybridSearch(query, 3);
+    String context = results.stream()
+        .map(r -> r.text)
+        .collect(Collectors.joining("\n\n"));
+    
+    ChatCompletionRequest request = ChatCompletionRequest.builder()
+        .model("gpt-4")
+        .messages(List.of(
+            new ChatMessage("system", 
+                "You are a helpful assistant."),
+            new ChatMessage("user", 
+                "Context:\n" + context + "\n\nQuestion: " + query)
+        ))
+        .build();
+    
+    ChatCompletionResult result = openai.createChatCompletion(request);
+    return result.getChoices().get(0).getMessage().getContent();
+}
+
+String answer = generateResponse("What Python projects have you worked on?");
+System.out.println(answer);
+```
+</Tab>
+</Tabs>
+
+---
+
+## Best Practices
+
+<Callout type="warn" title="Performance Tips">
+- **Batch operations**: Process embeddings and upserts in batches of 100
+- **Caching**: Cache frequent queries to reduce API calls
+- **Monitoring**: Track search latency and relevance metrics
+- **Reranking**: Consider using a reranker for better result quality
+</Callout>
+
+### Optimization Strategies
+
+1. **Chunking Strategy**
+   - Aim for 200-500 tokens per chunk
+   - Use 50-100 token overlap
+   - Preserve sentence boundaries
+
+2. **Metadata Design**
+   - Index important fields for filtering
+   - Keep metadata under 40KB in Pinecone
+   - Use keywords for categorical data
+
+3. **Search Tuning**
+   - Adjust `top_k` based on use case (3-10 typical)
+   - Experiment with score fusion methods
+   - Boost title matches with `^2` multiplier
+
+4. **Error Handling**
+   - Implement retry logic for API calls
+   - Validate embeddings dimensions
+   - Handle rate limits gracefully
+
+---
+
+## Testing Your RAG System
+
+```python
+# Example test queries
+test_queries = [
+    "What technologies do you use?",
+    "Tell me about your machine learning experience",
+    "What projects involve Python?",
+    "Describe your resume"
+]
+
+for query in test_queries:
+    print(f"\n🔍 Query: {query}")
+    results = hybrid_search(query, top_k=2)
+    for doc_id, data in results:
+        print(f"   Score: {data['score']:.3f}")
+        print(f"   Text: {data['text'][:100]}...")
+```
+
+<Callout title="Next Steps">
+- Add query expansion for better recall
+- Implement user feedback loops
+- Set up monitoring and analytics
+- Consider fine-tuning embeddings for your domain
+</Callout>
+
+---
+
+## Troubleshooting
+
+<Accordions>
+<Accordion title="Embeddings dimension mismatch">
+Ensure you're using `text-embedding-3-large` with `dimensions=1024` in both creation and querying.
+</Accordion>
+
+<Accordion title="OpenSearch connection fails">
+Check SSL certificates and authentication. Use `verify_certs=False` for testing only.
+</Accordion>
+
+<Accordion title="Low search quality">
+Try: (1) Better chunking strategy, (2) Add metadata filters, (3) Increase `top_k`, (4) Implement reranking.
+</Accordion>
+</Accordions>
+
+---
+
+## Resources
+
+- [Pinecone Documentation](https://docs.pinecone.io)
+- [OpenSearch Guide](https://opensearch.org/docs/latest/)
+- [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings)
+- [Sanity.io Docs](https://www.sanity.io/docs)
