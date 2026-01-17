@@ -1,0 +1,1109 @@
+---
+title: Generative AI with Python
+slug: generative-ai/generative-ai
+description: Explore popular Python libraries for Generative AI, including OpenAI, Anthropic Claude, LangChain, Hugging Face Transformers, and LlamaIndex.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+<Callout type="warn">
+Ensure you have the necessary API keys and proper authentication set up before using these libraries.
+</Callout>
+
+### OpenAI
+
+**OpenAI** provides powerful AI models through a simple API, including GPT models for text generation, DALL-E for image generation, and Whisper for speech recognition.
+
+**Key Features**:
+- **Chat Completions**: Generate conversational responses using GPT models
+- **Streaming**: Receive responses in real-time as they're generated
+- **Function Calling**: Allow models to call external functions/APIs
+- **Image Generation (DALL-E)**: Create images from text descriptions
+- **Embeddings**: Convert text into numerical vectors for similarity search
+- **Vision**: Analyze and describe images
+- **Audio (Whisper)**: Transcribe and translate audio
+- **Text-to-Speech**: Convert text into natural-sounding speech
+- **Fine-tuning**: Customize models for specific tasks
+
+**Use Cases**: Chatbots, content generation, code assistance, image creation, data analysis, translation
+
+```python
+from openai import OpenAI
+import os
+
+# Initialize client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# Basic chat completion
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Explain quantum computing in simple terms"}
+    ],
+    temperature=0.7,
+    max_tokens=500
+)
+
+print(response.choices[0].message.content)
+
+# Streaming responses
+stream = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "Write a short story about AI"}],
+    stream=True
+)
+
+for chunk in stream:
+    if chunk.choices[0].delta.content is not None:
+        print(chunk.choices[0].delta.content, end="", flush=True)
+
+# Function calling
+functions = [
+    {
+        "name": "get_weather",
+        "description": "Get the current weather in a location",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "location": {
+                    "type": "string",
+                    "description": "The city and state, e.g. San Francisco, CA"
+                },
+                "unit": {
+                    "type": "string",
+                    "enum": ["celsius", "fahrenheit"]
+                }
+            },
+            "required": ["location"]
+        }
+    }
+]
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "What's the weather in Boston?"}],
+    functions=functions,
+    function_call="auto"
+)
+
+# Image generation with DALL-E
+image_response = client.images.generate(
+    model="dall-e-3",
+    prompt="A serene landscape with mountains and a lake at sunset",
+    size="1024x1024",
+    quality="standard",
+    n=1
+)
+
+image_url = image_response.data[0].url
+print(f"Image URL: {image_url}")
+
+# Image editing
+with open("image.png", "rb") as image_file:
+    response = client.images.edit(
+        image=image_file,
+        prompt="Add a rainbow to the sky",
+        n=1,
+        size="1024x1024"
+    )
+
+# Image variations
+with open("image.png", "rb") as image_file:
+    response = client.images.create_variation(
+        image=image_file,
+        n=2,
+        size="1024x1024"
+    )
+
+# Text embeddings
+embedding_response = client.embeddings.create(
+    model="text-embedding-3-small",
+    input="Your text to embed"
+)
+
+embedding = embedding_response.data[0].embedding
+print(f"Embedding dimension: {len(embedding)}")
+
+# Batch embeddings
+texts = ["First text", "Second text", "Third text"]
+batch_response = client.embeddings.create(
+    model="text-embedding-3-small",
+    input=texts
+)
+
+embeddings = [item.embedding for item in batch_response.data]
+
+# Audio transcription (Whisper)
+with open("audio.mp3", "rb") as audio_file:
+    transcript = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=audio_file
+    )
+print(transcript.text)
+
+# Audio translation
+with open("audio.mp3", "rb") as audio_file:
+    translation = client.audio.translations.create(
+        model="whisper-1",
+        file=audio_file
+    )
+
+# Text-to-speech
+speech_response = client.audio.speech.create(
+    model="tts-1",
+    voice="alloy",
+    input="Hello! This is a test of text to speech."
+)
+
+speech_response.stream_to_file("output.mp3")
+
+# Moderation
+moderation_response = client.moderations.create(
+    input="Text to check for policy violations"
+)
+
+results = moderation_response.results[0]
+print(f"Flagged: {results.flagged}")
+
+# Vision (GPT-4 Vision)
+response = client.chat.completions.create(
+    model="gpt-4-vision-preview",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "What's in this image?"},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": "https://example.com/image.jpg"
+                    }
+                }
+            ]
+        }
+    ],
+    max_tokens=300
+)
+
+# Assistants API
+assistant = client.beta.assistants.create(
+    name="Math Tutor",
+    instructions="You are a helpful math tutor.",
+    model="gpt-4"
+)
+
+thread = client.beta.threads.create()
+
+message = client.beta.threads.messages.create(
+    thread_id=thread.id,
+    role="user",
+    content="Solve for x: 2x + 5 = 13"
+)
+
+run = client.beta.threads.runs.create(
+    thread_id=thread.id,
+    assistant_id=assistant.id
+)
+
+# Fine-tuning
+training_file = client.files.create(
+    file=open("training_data.jsonl", "rb"),
+    purpose="fine-tune"
+)
+
+fine_tune_job = client.fine_tuning.jobs.create(
+    training_file=training_file.id,
+    model="gpt-3.5-turbo"
+)
+```
+
+### Anthropic Claude
+
+**Anthropic Claude** is an AI assistant known for being helpful, harmless, and honest. It excels at long-context understanding and complex reasoning tasks.
+
+**Key Features**:
+- **Messages API**: Create conversational interactions with Claude
+- **Long Context**: Handle up to 200K tokens of context
+- **Vision**: Analyze images and documents
+- **Streaming**: Real-time response generation
+- **System Prompts**: Set behavioral guidelines for Claude
+- **Multi-turn Conversations**: Maintain conversation history
+
+**Model Tiers**:
+- **Claude Sonnet**: Balance of intelligence and speed
+- **Claude Opus**: Maximum intelligence for complex tasks
+- **Claude Haiku**: Fast and cost-effective
+
+**Use Cases**: Document analysis, coding assistance, research, creative writing, complex reasoning tasks
+
+```python
+from anthropic import Anthropic
+import os
+
+# Initialize client
+client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+# Create message
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "Explain machine learning algorithms"}
+    ]
+)
+
+print(message.content[0].text)
+
+# With system prompt
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    system="You are a Python programming expert.",
+    messages=[
+        {"role": "user", "content": "Explain decorators in Python"}
+    ]
+)
+
+# Streaming responses
+with client.messages.stream(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "Write a poem about AI"}]
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
+
+# Multi-turn conversation
+conversation = [
+    {"role": "user", "content": "Hello! Can you help me with Python?"},
+]
+
+response1 = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=conversation
+)
+
+conversation.append({"role": "assistant", "content": response1.content[0].text})
+conversation.append({"role": "user", "content": "What are list comprehensions?"})
+
+response2 = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=conversation
+)
+
+# Vision capabilities
+import base64
+
+with open("image.jpg", "rb") as img_file:
+    img_data = base64.b64encode(img_file.read()).decode()
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "image/jpeg",
+                        "data": img_data,
+                    },
+                },
+                {
+                    "type": "text",
+                    "text": "What's in this image?"
+                }
+            ],
+        }
+    ],
+)
+
+# Document analysis (PDF)
+with open("document.pdf", "rb") as pdf_file:
+    pdf_data = base64.b64encode(pdf_file.read()).decode()
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "document",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "application/pdf",
+                        "data": pdf_data,
+                    },
+                },
+                {
+                    "type": "text",
+                    "text": "Summarize this document"
+                }
+            ],
+        }
+    ],
+)
+
+# Temperature and other parameters
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=2048,
+    temperature=0.5,
+    top_p=0.9,
+    messages=[{"role": "user", "content": "Generate creative story ideas"}]
+)
+
+# Stop sequences
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    stop_sequences=["END"],
+    messages=[{"role": "user", "content": "List 5 items and then say END"}]
+)
+
+# Counting tokens
+def count_tokens(text):
+    return client.count_tokens(text)
+
+token_count = count_tokens("Hello, world!")
+print(f"Token count: {token_count}")
+```
+
+### LangChain
+
+**LangChain** is a framework for developing applications powered by language models. It provides tools to chain together LLM calls, manage context, and build complex AI workflows.
+
+**Core Components**:
+
+**Chains**: Sequence multiple LLM calls or operations together. Types include:
+- **LLMChain**: Basic chain linking prompt and LLM
+- **SequentialChain**: Chain outputs become inputs for next chain
+- **RouterChain**: Dynamically route to different chains based on input
+
+**Prompts**: Templates for structuring input to language models with variables and formatting.
+
+**Memory**: Store and retrieve conversation history to maintain context across interactions.
+
+**Agents**: AI systems that use LLMs to decide which actions to take and in what order. They can use tools like calculators, search engines, or APIs.
+
+**Document Loaders**: Import data from various sources (PDFs, websites, databases).
+
+**Text Splitters**: Break large documents into chunks for processing.
+
+**Vector Stores**: Store and retrieve document embeddings for semantic search (FAISS, Chroma, Pinecone).
+
+**Embeddings**: Convert text to numerical vectors for similarity comparisons.
+
+**Use Cases**: Chatbots, question-answering systems, document analysis, automated research, data extraction
+
+```python
+from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts import PromptTemplate, ChatPromptTemplate
+from langchain.chains import LLMChain, SequentialChain, SimpleSequentialChain
+from langchain.memory import ConversationBufferMemory, ConversationSummaryMemory
+from langchain.agents import initialize_agent, Tool, AgentType
+from langchain.document_loaders import TextLoader, PyPDFLoader, CSVLoader
+from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import FAISS, Chroma
+from langchain.chains import RetrievalQA
+import os
+
+# Basic LLM usage
+llm = OpenAI(temperature=0.7, openai_api_key=os.getenv("OPENAI_API_KEY"))
+response = llm("What is the capital of France?")
+print(response)
+
+# Chat model
+chat_model = ChatOpenAI(temperature=0.7)
+from langchain.schema import HumanMessage, SystemMessage
+
+messages = [
+    SystemMessage(content="You are a helpful assistant"),
+    HumanMessage(content="Tell me about Python")
+]
+response = chat_model(messages)
+
+# Prompt templates
+template = """You are an expert {role}.
+Question: {question}
+Answer:"""
+
+prompt = PromptTemplate(
+    input_variables=["role", "question"],
+    template=template
+)
+
+chain = LLMChain(llm=llm, prompt=prompt)
+result = chain.run(role="historian", question="What caused World War I?")
+
+# Chat prompt template
+chat_template = ChatPromptTemplate.from_messages([
+    ("system", "You are a {role}"),
+    ("human", "{input}")
+])
+
+# Sequential chains
+from langchain.chains import SimpleSequentialChain, SequentialChain
+
+first_prompt = PromptTemplate(
+    input_variables=["topic"],
+    template="Write a short summary about {topic}"
+)
+second_prompt = PromptTemplate(
+    input_variables=["summary"],
+    template="Translate this to Spanish: {summary}"
+)
+
+chain_one = LLMChain(llm=llm, prompt=first_prompt, output_key="summary")
+chain_two = LLMChain(llm=llm, prompt=second_prompt, output_key="spanish_summary")
+
+overall_chain = SequentialChain(
+    chains=[chain_one, chain_two],
+    input_variables=["topic"],
+    output_variables=["summary", "spanish_summary"],
+    verbose=True
+)
+
+result = overall_chain({"topic": "artificial intelligence"})
+
+# Memory for conversations
+memory = ConversationBufferMemory()
+conversation_chain = LLMChain(
+    llm=llm,
+    prompt=prompt,
+    memory=memory
+)
+
+# Summary memory (for long conversations)
+summary_memory = ConversationSummaryMemory(llm=llm)
+
+# Document loaders
+text_loader = TextLoader("document.txt")
+pdf_loader = PyPDFLoader("document.pdf")
+csv_loader = CSVLoader("data.csv")
+
+documents = text_loader.load()
+
+# Text splitting
+text_splitter = CharacterTextSplitter(
+    chunk_size=1000,
+    chunk_overlap=200
+)
+docs = text_splitter.split_documents(documents)
+
+# Recursive text splitter (better for code)
+recursive_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000,
+    chunk_overlap=200,
+    separators=["\n\n", "\n", " ", ""]
+)
+
+# Embeddings and vector stores
+embeddings = OpenAIEmbeddings()
+
+# FAISS vector store
+db = FAISS.from_documents(docs, embeddings)
+query = "What is the main topic?"
+docs_result = db.similarity_search(query, k=3)
+
+# Save and load FAISS
+db.save_local("faiss_index")
+new_db = FAISS.load_local("faiss_index", embeddings)
+
+# Chroma vector store
+chroma_db = Chroma.from_documents(docs, embeddings, persist_directory="./chroma_db")
+chroma_db.persist()
+
+# Retrieval QA chain
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    chain_type="stuff",
+    retriever=db.as_retriever()
+)
+
+answer = qa_chain.run("What is discussed in the document?")
+
+# Agents with tools
+from langchain.tools import WikipediaQueryRun, DuckDuckGoSearchRun
+from langchain.utilities import WikipediaAPIWrapper
+
+wikipedia = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
+
+tools = [
+    Tool(
+        name="Wikipedia",
+        func=wikipedia.run,
+        description="Useful for looking up factual information"
+    ),
+    Tool(
+        name="Calculator",
+        func=lambda x: eval(x),
+        description="Useful for mathematical calculations"
+    )
+]
+
+agent = initialize_agent(
+    tools,
+    llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
+result = agent.run("What is the population of France multiplied by 2?")
+
+# Custom chain
+from langchain.chains.base import Chain
+from typing import Dict, List
+
+class CustomChain(Chain):
+    llm: OpenAI
+    
+    @property
+    def input_keys(self) -> List[str]:
+        return ["input"]
+    
+    @property
+    def output_keys(self) -> List[str]:
+        return ["output"]
+    
+    def _call(self, inputs: Dict[str, str]) -> Dict[str, str]:
+        response = self.llm(inputs["input"])
+        return {"output": response.upper()}
+
+custom_chain = CustomChain(llm=llm)
+
+# Output parsers
+from langchain.output_parsers import CommaSeparatedListOutputParser
+
+parser = CommaSeparatedListOutputParser()
+format_instructions = parser.get_format_instructions()
+
+prompt = PromptTemplate(
+    template="List 5 {subject}.\n{format_instructions}",
+    input_variables=["subject"],
+    partial_variables={"format_instructions": format_instructions}
+)
+
+chain = LLMChain(llm=llm, prompt=prompt)
+output = chain.run("programming languages")
+parsed_output = parser.parse(output)
+
+# Caching
+from langchain.cache import InMemoryCache
+import langchain
+langchain.llm_cache = InMemoryCache()
+
+# Callbacks
+from langchain.callbacks import StdOutCallbackHandler
+
+handler = StdOutCallbackHandler()
+llm_with_handler = OpenAI(callbacks=[handler])
+
+# Router chains
+from langchain.chains.router import MultiPromptChain
+from langchain.chains.router.llm_router import LLMRouterChain, RouterOutputParser
+
+physics_template = """You are a physics teacher. {input}"""
+math_template = """You are a math teacher. {input}"""
+
+prompt_infos = [
+    {
+        "name": "physics",
+        "description": "Good for physics questions",
+        "prompt_template": physics_template
+    },
+    {
+        "name": "math",
+        "description": "Good for math questions",
+        "prompt_template": math_template
+    }
+]
+
+destination_chains = {}
+for p_info in prompt_infos:
+    name = p_info["name"]
+    prompt_template = p_info["prompt_template"]
+    prompt = PromptTemplate(template=prompt_template, input_variables=["input"])
+    chain = LLMChain(llm=llm, prompt=prompt)
+    destination_chains[name] = chain
+```
+
+### Hugging Face Transformers
+
+**Hugging Face Transformers** is the leading library for state-of-the-art Natural Language Processing (NLP) and computer vision models. It provides thousands of pre-trained models that you can use immediately or fine-tune for your specific needs.
+
+**Key Concepts**:
+
+**Pipelines**: High-level API for common NLP tasks. Simply specify the task and model, and the pipeline handles tokenization, model inference, and post-processing automatically.
+
+**Common Tasks**:
+- **Text Generation**: Continue or complete text
+- **Text Classification**: Categorize text (sentiment analysis, topic classification)
+- **Question Answering**: Extract answers from context
+- **Named Entity Recognition (NER)**: Identify entities like names, locations, organizations
+- **Translation**: Translate between languages
+- **Summarization**: Condense long text into summaries
+- **Fill Mask**: Predict missing words
+- **Zero-Shot Classification**: Classify without training examples
+
+**Tokenizers**: Convert text into numbers (tokens) that models can process. Handle special tokens, padding, and truncation.
+
+**Models**: Pre-trained neural networks (BERT, GPT, T5, etc.) that you can use directly or fine-tune on your data.
+
+**Fine-tuning**: Adapt pre-trained models to your specific task with your own dataset using the Trainer API.
+
+**Use Cases**: Chatbots, sentiment analysis, content moderation, document classification, translation services, text summarization
+
+```python
+from transformers import (
+    pipeline,
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+    AutoModelForCausalLM,
+    AutoModelForQuestionAnswering,
+    Trainer,
+    TrainingArguments,
+    DataCollatorWithPadding
+)
+import torch
+from datasets import load_dataset
+
+# Text generation
+generator = pipeline('text-generation', model='gpt2')
+result = generator(
+    "Once upon a time",
+    max_length=50,
+    num_return_sequences=2,
+    temperature=0.8
+)
+for r in result:
+    print(r['generated_text'])
+
+# Sentiment analysis
+classifier = pipeline('sentiment-analysis')
+result = classifier("I love this product! It's amazing!")
+print(result)
+
+# Batch processing
+texts = [
+    "I love this!",
+    "This is terrible.",
+    "It's okay, I guess."
+]
+results = classifier(texts)
+
+# Question answering
+qa_pipeline = pipeline('question-answering')
+context = """
+Python is a high-level programming language. 
+It was created by Guido van Rossum and first released in 1991.
+"""
+question = "Who created Python?"
+answer = qa_pipeline(question=question, context=context)
+print(f"Answer: {answer['answer']}")
+print(f"Score: {answer['score']}")
+
+# Named Entity Recognition
+ner = pipeline("ner", grouped_entities=True)
+text = "Apple Inc. was founded by Steve Jobs in California in 1976."
+entities = ner(text)
+for entity in entities:
+    print(f"{entity['word']}: {entity['entity_group']} (score: {entity['score']:.3f})")
+
+# Using models directly
+model_name = "bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
+
+# Tokenization
+text = "Hello, how are you?"
+inputs = tokenizer(
+    text,
+    padding=True,
+    truncation=True,
+    return_tensors="pt"
+)
+
+# Get predictions
+with torch.no_grad():
+    outputs = model(**inputs)
+    predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
+    predicted_class = torch.argmax(predictions, dim=-1)
+
+print(f"Predictions: {predictions}")
+print(f"Predicted class: {predicted_class}")
+
+# Batch tokenization
+texts = ["First text", "Second text", "Third text"]
+batch_inputs = tokenizer(
+    texts,
+    padding=True,
+    truncation=True,
+    return_tensors="pt"
+)
+
+# Text summarization
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+article = """
+Artificial intelligence is transforming the world as we know it.
+From healthcare to finance, AI applications are becoming increasingly prevalent.
+Machine learning algorithms can now diagnose diseases, predict market trends,
+and even generate creative content. However, with great power comes great responsibility,
+and ethical considerations must be at the forefront of AI development.
+"""
+summary = summarizer(article, max_length=50, min_length=25, do_sample=False)
+print(summary[0]['summary_text'])
+
+# Translation
+translator_en_fr = pipeline("translation_en_to_fr", model="Helsinki-NLP/opus-mt-en-fr")
+translation = translator_en_fr("Hello, how are you?")
+print(translation[0]['translation_text'])
+
+translator_fr_en = pipeline("translation_fr_to_en", model="Helsinki-NLP/opus-mt-fr-en")
+
+# Zero-shot classification
+classifier = pipeline("zero-shot-classification")
+text = "This is a course about Python programming"
+candidate_labels = ["education", "politics", "business", "technology"]
+result = classifier(text, candidate_labels)
+print(result)
+
+# Text generation with custom parameters
+text_generator = pipeline("text-generation", model="gpt2")
+generated = text_generator(
+    "The future of AI is",
+    max_length=100,
+    num_return_sequences=1,
+    top_k=50,
+    top_p=0.95,
+    temperature=0.8,
+    do_sample=True,
+    pad_token_id=50256
+)
+
+# Feature extraction (embeddings)
+feature_extractor = pipeline("feature-extraction", model="bert-base-uncased")
+features = feature_extractor("Hello world")
+
+# Fill mask
+fill_mask = pipeline("fill-mask", model="bert-base-uncased")
+result = fill_mask("Python is a [MASK] programming language.")
+for r in result:
+    print(f"{r['token_str']}: {r['score']:.3f}")
+
+# Image classification
+image_classifier = pipeline("image-classification", model="google/vit-base-patch16-224")
+# result = image_classifier("path/to/image.jpg")
+
+# Object detection
+object_detector = pipeline("object-detection", model="facebook/detr-resnet-50")
+# result = object_detector("path/to/image.jpg")
+
+# Fine-tuning example
+dataset = load_dataset("imdb")
+
+def tokenize_function(examples):
+    return tokenizer(examples["text"], padding="max_length", truncation=True)
+
+tokenized_datasets = dataset.map(tokenize_function, batched=True)
+
+small_train_dataset = tokenized_datasets["train"].shuffle(seed=42).select(range(1000))
+small_eval_dataset = tokenized_datasets["test"].shuffle(seed=42).select(range(1000))
+
+training_args = TrainingArguments(
+    output_dir="./results",
+    evaluation_strategy="epoch",
+    learning_rate=2e-5,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=16,
+    num_train_epochs=3,
+    weight_decay=0.01,
+    logging_dir='./logs',
+    logging_steps=10,
+    save_strategy="epoch"
+)
+
+data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=small_train_dataset,
+    eval_dataset=small_eval_dataset,
+    data_collator=data_collator
+)
+
+# trainer.train()
+# trainer.evaluate()
+
+# Save model
+# trainer.save_model("./my_model")
+# model.save_pretrained("./my_model")
+# tokenizer.save_pretrained("./my_model")
+
+# Load saved model
+# loaded_model = AutoModelForSequenceClassification.from_pretrained("./my_model")
+# loaded_tokenizer = AutoTokenizer.from_pretrained("./my_model")
+
+# Using different model architectures
+from transformers import GPT2LMHeadModel, T5ForConditionalGeneration
+
+# GPT-2 for text generation
+gpt2_model = GPT2LMHeadModel.from_pretrained("gpt2")
+gpt2_tokenizer = AutoTokenizer.from_pretrained("gpt2")
+
+# T5 for text-to-text tasks
+t5_model = T5ForConditionalGeneration.from_pretrained("t5-small")
+t5_tokenizer = AutoTokenizer.from_pretrained("t5-small")
+
+# Prepare input for T5
+input_text = "translate English to French: Hello, how are you?"
+input_ids = t5_tokenizer(input_text, return_tensors="pt").input_ids
+
+# Generate translation
+outputs = t5_model.generate(input_ids)
+translation = t5_tokenizer.decode(outputs[0], skip_special_tokens=True)
+```
+
+### LlamaIndex
+
+**LlamaIndex** (formerly GPT Index) is a data framework for building LLM-powered applications. It specializes in connecting custom data sources to large language models, enabling retrieval-augmented generation (RAG).
+
+**Core Concepts**:
+
+**Indexes**: Data structures that organize your documents for efficient retrieval:
+- **VectorStoreIndex**: Uses embeddings for semantic search
+- **KnowledgeGraphIndex**: Structures data as a graph
+- **TreeIndex**: Hierarchical document structure
+
+**Document Loaders**: Import data from various sources (text files, PDFs, websites, databases).
+
+**Query Engines**: Interface for asking questions about your indexed data. They retrieve relevant information and synthesize answers.
+
+**Chat Engines**: Maintain conversation history for multi-turn interactions with your data.
+
+**Retrievers**: Find relevant documents or passages based on queries.
+
+**Service Context**: Configuration for LLMs, embeddings, and other settings.
+
+**Storage**: Persist indexes to disk and reload them later.
+
+**Key Features**:
+- **RAG (Retrieval-Augmented Generation)**: Combine document retrieval with LLM generation
+- **Multi-document queries**: Search across multiple document collections
+- **Metadata filtering**: Filter documents by attributes
+- **Response synthesis**: Multiple strategies for combining retrieved information
+
+**Use Cases**: Question answering over documents, chatbots with knowledge bases, research assistants, documentation search, customer support systems
+
+```python
+from llama_index.core import (
+    VectorStoreIndex,
+    SimpleDirectoryReader,
+    ServiceContext,
+    StorageContext,
+    load_index_from_storage,
+    Document
+)
+from llama_index.llms.openai import OpenAI
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.core.node_parser import SimpleNodeParser
+from llama_index.core.retrievers import VectorIndexRetriever
+from llama_index.core.query_engine import RetrieverQueryEngine
+import os
+
+# Set API key
+os.environ["OPENAI_API_KEY"] = "your-key-here"
+
+# Load documents
+documents = SimpleDirectoryReader("data").load_data()
+
+# Create index
+index = VectorStoreIndex.from_documents(documents)
+
+# Query the index
+query_engine = index.as_query_engine()
+response = query_engine.query("What is the main topic of these documents?")
+print(response)
+
+# Custom LLM and embeddings
+llm = OpenAI(model="gpt-4", temperature=0.7)
+embed_model = OpenAIEmbedding()
+
+service_context = ServiceContext.from_defaults(
+    llm=llm,
+    embed_model=embed_model
+)
+
+index = VectorStoreIndex.from_documents(
+    documents,
+    service_context=service_context
+)
+
+# Persist and load index
+index.storage_context.persist(persist_dir="./storage")
+
+storage_context = StorageContext.from_defaults(persist_dir="./storage")
+loaded_index = load_index_from_storage(storage_context)
+
+# Chat mode
+chat_engine = index.as_chat_engine(
+    chat_mode="context",
+    verbose=True
+)
+response = chat_engine.chat("Tell me about the documents")
+response = chat_engine.chat("Can you elaborate on that?")
+
+# Streaming responses
+streaming_response = query_engine.query("Your query here")
+for text in streaming_response.response_gen:
+    print(text, end="", flush=True)
+
+# Advanced querying with retrievers
+retriever = VectorIndexRetriever(
+    index=index,
+    similarity_top_k=5
+)
+
+query_engine = RetrieverQueryEngine(retriever=retriever)
+response = query_engine.query("Your query here")
+
+# Custom prompts
+from llama_index.core import PromptTemplate
+
+qa_prompt_tmpl_str = (
+    "Context information is below.\n"
+    "---------------------\n"
+    "{context_str}\n"
+    "---------------------\n"
+    "Given the context information and not prior knowledge, "
+    "answer the query.\n"
+    "Query: {query_str}\n"
+    "Answer: "
+)
+qa_prompt_tmpl = PromptTemplate(qa_prompt_tmpl_str)
+
+query_engine = index.as_query_engine(
+    text_qa_template=qa_prompt_tmpl
+)
+
+# Document metadata
+doc1 = Document(
+    text="Python is a programming language",
+    metadata={"category": "programming", "author": "John"}
+)
+doc2 = Document(
+    text="Machine learning is a subset of AI",
+    metadata={"category": "AI", "author": "Jane"}
+)
+
+index = VectorStoreIndex.from_documents([doc1, doc2])
+
+# Metadata filtering
+from llama_index.core.vector_stores import MetadataFilters, ExactMatchFilter
+
+filters = MetadataFilters(
+    filters=[ExactMatchFilter(key="category", value="programming")]
+)
+
+retriever = VectorIndexRetriever(
+    index=index,
+    filters=filters,
+    similarity_top_k=2
+)
+
+# Response synthesis
+from llama_index.core.response_synthesizers import (
+    get_response_synthesizer,
+    ResponseMode
+)
+
+response_synthesizer = get_response_synthesizer(
+    response_mode=ResponseMode.TREE_SUMMARIZE
+)
+
+query_engine = RetrieverQueryEngine(
+    retriever=retriever,
+    response_synthesizer=response_synthesizer
+)
+
+# Router query engine
+from llama_index.core.query_engine import RouterQueryEngine
+from llama_index.core.selectors import LLMSingleSelector
+
+# Create different query engines
+vector_query_engine = index.as_query_engine()
+
+router_query_engine = RouterQueryEngine(
+    selector=LLMSingleSelector.from_defaults(),
+    query_engine_tools=[
+        {
+            "query_engine": vector_query_engine,
+            "description": "Useful for questions about documents"
+        }
+    ]
+)
+
+# Sub-question query engine
+from llama_index.core.query_engine import SubQuestionQueryEngine
+from llama_index.core.tools import QueryEngineTool
+
+query_engine_tools = [
+    QueryEngineTool.from_defaults(
+        query_engine=vector_query_engine,
+        description="Useful for questions about documents"
+    )
+]
+
+sub_query_engine = SubQuestionQueryEngine.from_defaults(
+    query_engine_tools=query_engine_tools
+)
+
+# Custom node parser
+node_parser = SimpleNodeParser.from_defaults(
+    chunk_size=512,
+    chunk_overlap=20
+)
+
+nodes = node_parser.get_nodes_from_documents(documents)
+
+# Build index from nodes
+index = VectorStoreIndex(nodes)
+
+# Composable graphs
+from llama_index.core import ComposableGraph
+
+# Create multiple indices
+index1 = VectorStoreIndex.from_documents(documents)
+index2 = VectorStoreIndex.from_documents(other_documents)
+
+# Compose them
+graph = ComposableGraph.from_indices(
+    [index1, index2],
+    index_summaries=["Summary 1", "Summary 2"]
+)
+
+query_engine = graph.as_query_engine()
+
+# Knowledge graph
+from llama_index.core import KnowledgeGraphIndex
+
+kg_index = KnowledgeGraphIndex.from_documents(
+    documents,
+    max_triplets_per_chunk=2
+)
+
+kg_query_engine = kg_index.as_query_engine()
+```
