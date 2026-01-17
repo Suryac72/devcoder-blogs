@@ -1,0 +1,1794 @@
+---
+title: Data Science with Python
+description: Essential Python libraries for data science including NumPy, Pandas, Matplotlib, and Seaborn.
+slug: generative-ai/data-science
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+<Callout type="info">
+These libraries form the foundation of data science and machine learning in Python.
+</Callout>
+
+### NumPy
+
+**NumPy (Numerical Python)** is the fundamental package for scientific computing in Python. It provides support for large, multi-dimensional arrays and matrices, along with mathematical functions to operate on these arrays efficiently.
+
+**Why NumPy?**
+- **Speed**: 10-100x faster than Python lists due to C implementation
+- **Memory Efficiency**: Uses less memory than Python lists
+- **Vectorization**: Perform operations on entire arrays without loops
+- **Broadcasting**: Automatic element-wise operations on arrays of different shapes
+
+**Key Concepts**:
+
+**Arrays (ndarray)**: Multi-dimensional, homogeneous data structures that store elements of the same type.
+
+**Array Creation**: Multiple methods including `array()`, `zeros()`, `ones()`, `arange()`, `linspace()`, `random` functions.
+
+**Array Operations**: Element-wise arithmetic, matrix operations, broadcasting, slicing, and indexing.
+
+**Linear Algebra**: Matrix multiplication, inverse, determinant, eigenvalues, solving equations.
+
+**Statistical Functions**: Mean, median, standard deviation, variance, percentiles.
+
+**Universal Functions (ufuncs)**: Fast element-wise operations like `sqrt()`, `exp()`, `sin()`, `log()`.
+
+**Use Cases**: Scientific computing, data analysis, machine learning, image processing, signal processing
+
+```python
+import numpy as np
+
+# Array creation
+arr1 = np.array([1, 2, 3, 4, 5])
+arr2 = np.zeros((3, 3))
+arr3 = np.ones((2, 4))
+arr4 = np.arange(0, 10, 2)
+arr5 = np.linspace(0, 1, 5)
+arr6 = np.eye(3)  # Identity matrix
+
+# Random arrays
+random_arr = np.random.rand(3, 3)  # Uniform [0, 1)
+normal_arr = np.random.randn(3, 3)  # Standard normal
+randint_arr = np.random.randint(0, 10, (3, 3))
+
+# Set random seed
+np.random.seed(42)
+
+# Array operations
+a = np.array([1, 2, 3])
+b = np.array([4, 5, 6])
+
+sum_arr = a + b
+difference = a - b
+product = a * b
+division = a / b
+power = a ** 2
+dot_product = np.dot(a, b)
+
+# Universal functions (ufuncs)
+arr = np.array([1, 2, 3, 4])
+print(np.sqrt(arr))
+print(np.exp(arr))
+print(np.log(arr))
+print(np.sin(arr))
+
+# Matrix operations
+matrix1 = np.array([[1, 2], [3, 4]])
+matrix2 = np.array([[5, 6], [7, 8]])
+
+# Matrix multiplication
+matmul = np.matmul(matrix1, matrix2)
+# or use @ operator
+matmul = matrix1 @ matrix2
+
+transpose = matrix1.T
+inverse = np.linalg.inv(matrix1)
+determinant = np.linalg.det(matrix1)
+eigenvalues, eigenvectors = np.linalg.eig(matrix1)
+
+# Solve linear equations: Ax = b
+A = np.array([[3, 1], [1, 2]])
+b = np.array([9, 8])
+x = np.linalg.solve(A, b)
+
+# Statistical operations
+data = np.random.randn(1000)
+mean = np.mean(data)
+std = np.std(data)
+var = np.var(data)
+median = np.median(data)
+percentile_75 = np.percentile(data, 75)
+min_val = np.min(data)
+max_val = np.max(data)
+
+# Multi-dimensional statistics
+matrix = np.random.randn(3, 4)
+col_means = np.mean(matrix, axis=0)
+row_means = np.mean(matrix, axis=1)
+
+# Reshaping and slicing
+arr = np.arange(12)
+reshaped = arr.reshape(3, 4)
+flattened = reshaped.flatten()
+raveled = reshaped.ravel()
+
+# Slicing
+matrix = np.arange(20).reshape(4, 5)
+print(matrix[0, :])  # First row
+print(matrix[:, 0])  # First column
+print(matrix[1:3, 2:4])  # Submatrix
+
+# Boolean indexing
+arr = np.arange(10)
+mask = arr > 5
+filtered = arr[mask]
+
+# Fancy indexing
+arr = np.arange(20)
+indices = [1, 3, 7, 15]
+selected = arr[indices]
+
+# Broadcasting
+a = np.array([[1, 2, 3], [4, 5, 6]])
+b = np.array([10, 20, 30])
+result = a + b  # b is broadcast
+
+# Concatenation and stacking
+a = np.array([[1, 2], [3, 4]])
+b = np.array([[5, 6], [7, 8]])
+
+concatenated = np.concatenate([a, b], axis=0)
+vstacked = np.vstack([a, b])
+hstacked = np.hstack([a, b])
+dstacked = np.dstack([a, b])
+
+# Splitting
+arr = np.arange(16).reshape(4, 4)
+split = np.split(arr, 2, axis=0)
+vsplit = np.vsplit(arr, 2)
+hsplit = np.hsplit(arr, 2)
+
+# Copying
+arr = np.array([1, 2, 3])
+view = arr.view()  # Creates a view
+copy = arr.copy()  # Creates a copy
+
+# Where function
+arr = np.array([1, 2, 3, 4, 5])
+result = np.where(arr > 2, arr, 0)
+
+# Unique values
+arr = np.array([1, 2, 2, 3, 3, 3, 4])
+unique = np.unique(arr)
+unique, counts = np.unique(arr, return_counts=True)
+
+# Sorting
+arr = np.array([3, 1, 4, 1, 5, 9, 2, 6])
+sorted_arr = np.sort(arr)
+indices = np.argsort(arr)
+
+# Saving and loading
+arr = np.array([1, 2, 3, 4, 5])
+np.save('array.npy', arr)
+loaded = np.load('array.npy')
+
+# Save multiple arrays
+np.savez('arrays.npz', a=arr, b=matrix)
+data = np.load('arrays.npz')
+```
+
+### Pandas
+
+**Pandas** is a powerful data manipulation and analysis library. It provides easy-to-use data structures (DataFrame and Series) for working with structured data.
+
+**Core Data Structures**:
+
+**Series**: One-dimensional labeled array, like a column in a spreadsheet.
+
+**DataFrame**: Two-dimensional labeled data structure with columns of potentially different types, like a spreadsheet or SQL table.
+
+**Key Features**:
+
+**Data Import/Export**: Read from and write to CSV, Excel, JSON, SQL databases, and many other formats.
+
+**Data Selection**: Multiple ways to access data using labels (`.loc`) or positions (`.iloc`).
+
+**Data Cleaning**: Handle missing values with `fillna()`, `dropna()`, `interpolate()`.
+
+**Data Transformation**:
+- **Sorting**: Organize by values or index
+- **Filtering**: Select rows based on conditions
+- **Grouping**: Split-apply-combine operations with `groupby()`
+- **Merging**: Combine datasets using `merge()`, `join()`, `concat()`
+
+**Aggregation**: Calculate statistics (mean, sum, count) on groups of data.
+
+**Time Series**: Specialized functionality for date/time data including resampling, rolling windows, time shifts.
+
+**Pivot Tables**: Create Excel-style pivot tables for data summarization.
+
+**Apply Functions**: Apply custom functions to rows, columns, or entire DataFrames.
+
+**Use Cases**: Data cleaning, exploratory data analysis, financial analysis, statistical analysis, data preparation for ML
+
+```python
+import pandas as pd
+import numpy as np
+
+# Creating DataFrames
+df = pd.DataFrame({
+    'name': ['Alice', 'Bob', 'Charlie', 'David'],
+    'age': [25, 30, 35, 40],
+    'city': ['New York', 'London', 'Paris', 'Tokyo'],
+    'salary': [50000, 60000, 70000, 80000]
+})
+
+# From dictionary of lists
+data = {
+    'A': [1, 2, 3],
+    'B': [4, 5, 6]
+}
+df = pd.DataFrame(data)
+
+# From list of dictionaries
+data = [
+    {'A': 1, 'B': 4},
+    {'A': 2, 'B': 5},
+    {'A': 3, 'B': 6}
+]
+df = pd.DataFrame(data)
+
+# Reading data
+df_csv = pd.read_csv('data.csv')
+df_excel = pd.read_excel('data.xlsx', sheet_name='Sheet1')
+df_json = pd.read_json('data.json')
+df_sql = pd.read_sql('SELECT * FROM table', connection)
+
+# Reading with options
+df = pd.read_csv(
+    'data.csv',
+    sep=',',
+    header=0,
+    names=['col1', 'col2'],
+    index_col=0,
+    usecols=['col1', 'col2'],
+    dtype={'col1': int},
+    parse_dates=['date_col'],
+    na_values=['NA', 'missing']
+)
+
+# Basic operations
+print(df.head(10))
+print(df.tail(5))
+print(df.info())
+print(df.describe())
+print(df.shape)
+print(df.columns)
+print(df.index)
+print(df.dtypes)
+
+# Selecting data
+names = df['name']
+subset = df[['name', 'age']]
+row = df.iloc[0]
+row_label = df.loc[0]
+cell = df.iloc[0, 1]
+cell_label = df.loc[0, 'age']
+
+# Slicing
+print(df.iloc[0:3])
+print(df.iloc[:, 0:2])
+print(df.loc[0:2, 'name':'age'])
+
+# Boolean indexing
+filtered = df[df['age'] > 30]
+multi_condition = df[(df['age'] > 25) & (df['salary'] > 55000)]
+isin_filter = df[df['city'].isin(['New York', 'London'])]
+
+# Adding and modifying columns
+df['bonus'] = df['salary'] * 0.1
+df['full_info'] = df['name'] + ' - ' + df['city']
+df['age_category'] = df['age'].apply(lambda x: 'Young' if x < 30 else 'Old')
+
+# Dropping columns and rows
+df_dropped = df.drop('bonus', axis=1)
+df_dropped = df.drop([0, 1], axis=0)
+df.drop(['bonus', 'full_info'], axis=1, inplace=True)
+
+# Renaming columns
+df_renamed = df.rename(columns={'name': 'full_name', 'age': 'years'})
+
+# Sorting
+sorted_df = df.sort_values('age', ascending=False)
+sorted_multi = df.sort_values(['city', 'age'], ascending=[True, False])
+sorted_index = df.sort_index()
+
+# Grouping and aggregation
+grouped = df.groupby('city')['salary'].mean()
+agg_result = df.groupby('city').agg({
+    'salary': ['mean', 'sum', 'count', 'std'],
+    'age': ['mean', 'min', 'max']
+})
+
+# Custom aggregation
+grouped = df.groupby('city')['salary'].agg(['mean', ('range', lambda x: x.max() - x.min())])
+
+# Transform (keep same shape)
+df['salary_normalized'] = df.groupby('city')['salary'].transform(lambda x: (x - x.mean()) / x.std())
+
+# Merging and joining
+df1 = pd.DataFrame({'key': ['A', 'B', 'C'], 'value1': [1, 2, 3]})
+df2 = pd.DataFrame({'key': ['A', 'B', 'D'], 'value2': [4, 5, 6]})
+
+inner_join = pd.merge(df1, df2, on='key', how='inner')
+left_join = pd.merge(df1, df2, on='key', how='left')
+right_join = pd.merge(df1, df2, on='key', how='right')
+outer_join = pd.merge(df1, df2, on='key', how='outer')
+
+# Concatenation
+df_concat = pd.concat([df1, df2], axis=0, ignore_index=True)
+df_concat_cols = pd.concat([df1, df2], axis=1)
+
+# Handling missing data
+df_with_nan = df.copy()
+df_with_nan.loc[0, 'age'] = np.nan
+
+# Detect missing
+print(df_with_nan.isnull())
+print(df_with_nan.isna())
+print(df_with_nan.isnull().sum())
+
+# Fill missing
+df_filled = df_with_nan.fillna(0)
+df_filled = df_with_nan.fillna({'age': 0, 'salary': 50000})
+df_filled = df_with_nan.fillna(method='ffill')  # Forward fill
+df_filled = df_with_nan.fillna(method='bfill')  # Backward fill
+
+# Drop missing
+df_dropped = df_with_nan.dropna()
+df_dropped = df_with_nan.dropna(subset=['age'])
+df_dropped = df_with_nan.dropna(thresh=3)  # Keep rows with at least 3 non-NA
+
+# Interpolate
+df_interpolated = df_with_nan.interpolate()
+
+# Time series
+dates = pd.date_range('2024-01-01', periods=100, freq='D')
+ts = pd.Series(np.random.randn(100), index=dates)
+
+# Resampling
+monthly = ts.resample('M').mean()
+weekly = ts.resample('W').sum()
+
+# Rolling window
+rolling_mean = ts.rolling(window=7).mean()
+rolling_std = ts.rolling(window=7).std()
+
+# Expanding window
+expanding_mean = ts.expanding().mean()
+
+# Shift
+shifted = ts.shift(1)  # Shift forward
+shifted_back = ts.shift(-1)  # Shift backward
+
+# Pivot tables
+pivot = df.pivot_table(
+    values='salary',
+    index='city',
+    aggfunc='mean'
+)
+
+pivot_multi = df.pivot_table(
+    values='salary',
+    index='city',
+    columns='age',
+    aggfunc=['mean', 'sum'],
+    fill_value=0
+)
+
+# Cross-tabulation
+crosstab = pd.crosstab(df['city'], df['age'])
+
+# Apply functions
+df['age_doubled'] = df['age'].apply(lambda x: x * 2)
+df['name_upper'] = df['name'].apply(str.upper)
+
+# Apply to multiple columns
+df[['age', 'salary']] = df[['age', 'salary']].apply(lambda x: x * 2)
+
+# Apply row-wise
+df['sum'] = df.apply(lambda row: row['age'] + row['salary'], axis=1)
+
+# String operations
+df['name_upper'] = df['name'].str.upper()
+df['name_lower'] = df['name'].str.lower()
+df['name_length'] = df['name'].str.len()
+df['starts_with_a'] = df['name'].str.startswith('A')
+df['contains_b'] = df['name'].str.contains('b')
+df['name_split'] = df['name'].str.split(' ')
+
+# DateTime operations
+df['date'] = pd.to_datetime('2024-01-01')
+df['year'] = df['date'].dt.year
+df['month'] = df['date'].dt.month
+df['day'] = df['date'].dt.day
+df['dayofweek'] = df['date'].dt.dayofweek
+
+# Categorical data
+df['city_cat'] = df['city'].astype('category')
+df['city_codes'] = df['city_cat'].cat.codes
+
+# Duplicates
+duplicates = df.duplicated()
+df_no_dupes = df.drop_duplicates()
+df_no_dupes = df.drop_duplicates(subset=['name'], keep='first')
+
+# Replacing values
+df_replaced = df.replace({'New York': 'NYC', 'London': 'LDN'})
+df_replaced = df.replace([50000, 60000], [55000, 65000])
+
+# Value counts
+counts = df['city'].value_counts()
+proportions = df['city'].value_counts(normalize=True)
+
+# Binning
+df['age_bins'] = pd.cut(df['age'], bins=[0, 30, 40, 100], labels=['Young', 'Middle', 'Old'])
+df['age_qcut'] = pd.qcut(df['age'], q=3, labels=['Low', 'Medium', 'High'])
+
+# MultiIndex
+multi_index = pd.MultiIndex.from_tuples([
+    ('A', 1), ('A', 2), ('B', 1), ('B', 2)
+], names=['letter', 'number'])
+df_multi = pd.DataFrame({'value': [10, 20, 30, 40]}, index=multi_index)
+
+# Accessing MultiIndex
+print(df_multi.loc['A'])
+print(df_multi.loc[('A', 1)])
+
+# Stack and unstack
+stacked = df_multi.stack()
+unstacked = df_multi.unstack()
+
+# Writing data
+df.to_csv('output.csv', index=False)
+df.to_excel('output.xlsx', sheet_name='Sheet1', index=False)
+df.to_json('output.json', orient='records')
+df.to_sql('table_name', connection, if_exists='replace')
+
+# Memory optimization
+print(df.memory_usage(deep=True))
+df['age'] = df['age'].astype('int8')
+df['city'] = df['city'].astype('category')
+```
+
+### Matplotlib
+
+**Matplotlib** is the foundational plotting library in Python. It provides a MATLAB-like interface for creating static, animated, and interactive visualizations.
+
+**Key Components**:
+
+**Figure**: The entire window or page where plots appear.
+
+**Axes**: The area where data is plotted (can have multiple axes in one figure).
+
+**Plot Types**:
+- **Line plots**: Show trends over continuous data
+- **Scatter plots**: Show relationships between two variables
+- **Bar plots**: Compare categorical data
+- **Histograms**: Show distribution of continuous data
+- **Box plots**: Show statistical distribution with quartiles
+- **Pie charts**: Show proportions of a whole
+- **Heatmaps**: Visualize matrix data with colors
+- **Contour plots**: Show 3D data in 2D with contour lines
+- **3D plots**: Visualize three-dimensional data
+
+**Customization**:
+- Colors, line styles, markers
+- Labels, titles, legends
+- Grid lines, spines
+- Font sizes and styles
+- Figure size and DPI
+
+**Subplots**: Create multiple plots in a single figure using `subplots()`.
+
+**Styles**: Pre-defined style sheets for consistent aesthetics.
+
+**Use Cases**: Data exploration, scientific publications, presentations, reports, dashboards
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Basic line plot
+x = np.linspace(0, 10, 100)
+y = np.sin(x)
+
+plt.figure(figsize=(10, 6))
+plt.plot(x, y, label='sin(x)', color='blue', linewidth=2, linestyle='-')
+plt.xlabel('X axis', fontsize=12)
+plt.ylabel('Y axis', fontsize=12)
+plt.title('Sine Wave', fontsize=14)
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# Multiple lines
+plt.figure(figsize=(10, 6))
+plt.plot(x, np.sin(x), label='sin(x)', color='blue')
+plt.plot(x, np.cos(x), label='cos(x)', color='red', linestyle='--')
+plt.plot(x, np.tan(x), label='tan(x)', color='green', linestyle=':')
+plt.ylim(-2, 2)
+plt.legend(loc='upper right')
+plt.grid(True)
+plt.show()
+
+# Subplot layouts
+fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+
+axes[0, 0].plot(x, np.sin(x), 'b-')
+axes[0, 0].set_title('Sine')
+axes[0, 0].grid(True)
+
+axes[0, 1].plot(x, np.cos(x), 'r--')
+axes[0, 1].set_title('Cosine')
+
+axes[1, 0].plot(x, np.tan(x), 'g:')
+axes[1, 0].set_title('Tangent')
+axes[1, 0].set_ylim(-5, 5)
+
+axes[1, 1].plot(x, np.exp(-x/10), 'purple')
+axes[1, 1].set_title('Exponential Decay')
+
+plt.tight_layout()
+plt.show()
+
+# Scatter plot
+x = np.random.randn(100)
+y = np.random.randn(100)
+colors = np.random.rand(100)
+sizes = 1000 * np.random.rand(100)
+
+plt.figure(figsize=(10, 6))
+scatter = plt.scatter(x, y, c=colors, s=sizes, alpha=0.5, cmap='viridis', edgecolors='black')
+plt.colorbar(scatter, label='Color value')
+plt.xlabel('X values')
+plt.ylabel('Y values')
+plt.title('Scatter Plot with Size and Color')
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# Bar plot
+categories = ['A', 'B', 'C', 'D', 'E']
+values = [25, 40, 30, 55, 45]
+
+plt.figure(figsize=(10, 6))
+bars = plt.bar(categories, values, color='skyblue', edgecolor='black', alpha=0.7)
+plt.xlabel('Categories')
+plt.ylabel('Values')
+plt.title('Bar Chart')
+plt.grid(True, axis='y', alpha=0.3)
+
+# Add value labels on bars
+for bar in bars:
+    height = bar.get_height()
+    plt.text(bar.get_x() + bar.get_width()/2., height,
+             f'{height:.0f}', ha='center', va='bottom')
+
+plt.show()
+
+# Grouped bar plot
+x = np.arange(len(categories))
+values1 = [25, 40, 30, 55, 45]
+values2 = [30, 35, 40, 50, 40]
+width = 0.35
+
+plt.figure(figsize=(10, 6))
+plt.bar(x - width/2, values1, width, label='Group 1', color='skyblue')
+plt.bar(x + width/2, values2, width, label='Group 2', color='lightcoral')
+plt.xlabel('Categories')
+plt.ylabel('Values')
+plt.title('Grouped Bar Chart')
+plt.xticks(x, categories)
+plt.legend()
+plt.grid(True, axis='y', alpha=0.3)
+plt.show()
+
+# Horizontal bar plot
+plt.figure(figsize=(10, 6))
+plt.barh(categories, values, color='coral')
+plt.xlabel('Values')
+plt.ylabel('Categories')
+plt.title('Horizontal Bar Chart')
+plt.grid(True, axis='x', alpha=0.3)
+plt.show()
+
+# Histogram
+data = np.random.randn(1000)
+
+plt.figure(figsize=(10, 6))
+n, bins, patches = plt.hist(data, bins=30, alpha=0.7, color='green', edgecolor='black')
+plt.axvline(data.mean(), color='red', linestyle='--', linewidth=2, label=f'Mean: {data.mean():.2f}')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+plt.title('Histogram with Mean Line')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# Multiple histograms
+data1 = np.random.randn(1000)
+data2 = np.random.randn(1000) + 2
+
+plt.figure(figsize=(10, 6))
+plt.hist(data1, bins=30, alpha=0.5, label='Distribution 1', color='blue')
+plt.hist(data2, bins=30, alpha=0.5, label='Distribution 2', color='red')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+plt.title('Overlapping Histograms')
+plt.legend()
+plt.show()
+
+# Box plot
+data = [np.random.randn(100) + i for i in range(5)]
+
+plt.figure(figsize=(10, 6))
+box = plt.boxplot(data, labels=['A', 'B', 'C', 'D', 'E'], patch_artist=True)
+for patch in box['boxes']:
+    patch.set_facecolor('lightblue')
+plt.ylabel('Values')
+plt.title('Box Plot')
+plt.grid(True, axis='y', alpha=0.3)
+plt.show()
+
+# Pie chart
+sizes = [30, 25, 20, 15, 10]
+labels = ['A', 'B', 'C', 'D', 'E']
+colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue', 'lightpink']
+explode = (0.1, 0, 0, 0, 0)
+
+plt.figure(figsize=(8, 8))
+plt.pie(sizes, explode=explode, labels=labels, colors=colors,
+        autopct='%1.1f%%', shadow=True, startangle=90)
+plt.title('Pie Chart')
+plt.axis('equal')
+plt.show()
+
+# Heatmap
+data = np.random.rand(10, 10)
+
+plt.figure(figsize=(10, 8))
+im = plt.imshow(data, cmap='hot', interpolation='nearest', aspect='auto')
+plt.colorbar(im, label='Value')
+plt.title('Heatmap')
+plt.xlabel('X axis')
+plt.ylabel('Y axis')
+plt.show()
+
+# Contour plot
+x = np.linspace(-3, 3, 100)
+y = np.linspace(-3, 3, 100)
+X, Y = np.meshgrid(x, y)
+Z = np.sin(np.sqrt(X**2 + Y**2))
+
+plt.figure(figsize=(10, 8))
+contour = plt.contour(X, Y, Z, levels=20, cmap='viridis')
+plt.clabel(contour, inline=True, fontsize=8)
+plt.colorbar(contour)
+plt.title('Contour Plot')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.show()
+
+# Filled contour
+plt.figure(figsize=(10, 8))
+contourf = plt.contourf(X, Y, Z, levels=20, cmap='viridis')
+plt.colorbar(contourf)
+plt.title('Filled Contour Plot')
+plt.show()
+
+# 3D plot
+from mpl_toolkits.mplot3d import Axes3D
+
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+x = np.linspace(-5, 5, 50)
+y = np.linspace(-5, 5, 50)
+X, Y = np.meshgrid(x, y)
+Z = np.sin(np.sqrt(X**2 + Y**2))
+
+surf = ax.plot_surface(X, Y, Z, cmap='viridis', alpha=0.8)
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+ax.set_title('3D Surface Plot')
+fig.colorbar(surf)
+plt.show()
+
+# Customization
+plt.style.use('seaborn-v0_8-darkgrid')
+
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.plot(x, y, color='#FF6B6B', linewidth=2.5, linestyle='-', marker='o', 
+        markersize=4, markerfacecolor='white', markeredgewidth=1.5)
+ax.set_facecolor('#F0F0F0')
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+plt.show()
+
+# Save figure
+plt.savefig('plot.png', dpi=300, bbox_inches='tight', transparent=True)
+plt.savefig('plot.pdf')  # Vector format
+```
+
+### Seaborn
+
+**Seaborn** is a statistical visualization library built on top of Matplotlib. It provides a high-level interface for creating attractive and informative statistical graphics with less code.
+
+**Why Seaborn?**
+- **Better default aesthetics**: More attractive plots out of the box
+- **Statistical functions**: Built-in support for visualizing distributions and relationships
+- **Easier syntax**: Less code for complex visualizations
+- **Integration**: Works seamlessly with Pandas DataFrames
+
+**Plot Categories**:
+
+**Distribution Plots**: Visualize single or multiple distributions
+- `histplot()`: Histograms with KDE
+- `kdeplot()`: Kernel density estimates
+- `boxplot()`: Box-and-whisker plots
+- `violinplot()`: Combination of box plot and KDE
+
+**Categorical Plots**: Visualize categorical data
+- `barplot()`: Bar charts with error bars
+- `countplot()`: Count of observations
+- `pointplot()`: Point estimates and confidence intervals
+
+**Relational Plots**: Show relationships between variables
+- `scatterplot()`: Scatter plots with multiple dimensions
+- `lineplot()`: Line plots with confidence intervals
+
+**Matrix Plots**: Visualize matrix data
+- `heatmap()`: Color-coded matrix visualization
+- `clustermap()`: Hierarchical clustering with heatmap
+
+**Multi-plot Grids**: Create complex multi-plot layouts
+- `FacetGrid`: Create a grid of plots based on data subsets
+- `PairGrid`: Plot pairwise relationships
+- `pairplot()`: Quick pairwise relationships with distributions
+
+**Color Palettes**: Sophisticated color schemes for better visualizations.
+
+**Use Cases**: Exploratory data analysis, statistical analysis, presentation graphics, pattern recognition
+
+```python
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+# Set style and context
+sns.set_style("whitegrid")
+sns.set_context("notebook")  # paper, notebook, talk, poster
+sns.set_palette("husl")
+
+# Load sample datasets
+tips = sns.load_dataset("tips")
+iris = sns.load_dataset("iris")
+flights = sns.load_dataset("flights")
+titanic = sns.load_dataset("titanic")
+
+# Distribution plots
+plt.figure(figsize=(10, 6))
+sns.histplot(tips['total_bill'], kde=True, bins=30, color='skyblue')
+plt.title('Distribution of Total Bill')
+plt.show()
+
+# KDE plot
+plt.figure(figsize=(10, 6))
+sns.kdeplot(data=tips, x='total_bill', hue='time', fill=True, alpha=0.5)
+plt.title('KDE Plot by Time')
+plt.show()
+
+# Distribution plot with rug
+plt.figure(figsize=(10, 6))
+sns.histplot(tips['total_bill'], kde=True)
+sns.rugplot(tips['total_bill'], color='red', alpha=0.5)
+plt.title('Distribution with Rug Plot')
+plt.show()
+
+# Box plot
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='day', y='total_bill', data=tips, palette='Set2')
+plt.title('Total Bill by Day')
+plt.show()
+
+# Box plot with hue
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='day', y='total_bill', hue='sex', data=tips)
+plt.title('Total Bill by Day and Gender')
+plt.show()
+
+# Violin plot
+plt.figure(figsize=(10, 6))
+sns.violinplot(x='day', y='total_bill', hue='sex', data=tips, split=True, palette='muted')
+plt.title('Violin Plot: Total Bill Distribution')
+plt.show()
+
+# Swarm plot
+plt.figure(figsize=(10, 6))
+sns.swarmplot(x='day', y='total_bill', data=tips, hue='sex')
+plt.title('Swarm Plot')
+plt.show()
+
+# Combined violin and swarm
+plt.figure(figsize=(10, 6))
+sns.violinplot(x='day', y='total_bill', data=tips, inner=None, color='lightgray')
+sns.swarmplot(x='day', y='total_bill', data=tips, size=3, color='black', alpha=0.5)
+plt.title('Combined Violin and Swarm Plot')
+plt.show()
+
+# Scatter plot with regression
+plt.figure(figsize=(10, 6))
+sns.regplot(x='total_bill', y='tip', data=tips, scatter_kws={'alpha':0.5})
+plt.title('Tip vs Total Bill with Regression Line')
+plt.show()
+
+# LM plot with hue
+sns.lmplot(x='total_bill', y='tip', hue='sex', data=tips, height=6, aspect=1.5)
+plt.show()
+
+# Joint plot
+sns.jointplot(x='total_bill', y='tip', data=tips, kind='scatter', height=8)
+plt.show()
+
+# Joint plot variations
+sns.jointplot(x='total_bill', y='tip', data=tips, kind='hex', height=8)
+plt.show()
+
+sns.jointplot(x='total_bill', y='tip', data=tips, kind='kde', height=8)
+plt.show()
+
+sns.jointplot(x='total_bill', y='tip', data=tips, kind='reg', height=8)
+plt.show()
+
+# Pair plot
+sns.pairplot(iris, hue='species', diag_kind='kde', height=2.5)
+plt.show()
+
+# Pair plot with specific variables
+sns.pairplot(iris, vars=['sepal_length', 'sepal_width'], hue='species')
+plt.show()
+
+# Heatmap with correlation
+plt.figure(figsize=(10, 8))
+correlation = tips.corr()
+sns.heatmap(correlation, annot=True, cmap='coolwarm', center=0, 
+            square=True, linewidths=1, cbar_kws={"shrink": 0.8})
+plt.title('Correlation Heatmap')
+plt.show()
+
+# Clustermap
+sns.clustermap(iris.drop('species', axis=1).T, cmap='viridis', 
+               standard_scale=1, figsize=(10, 8))
+plt.show()
+
+# Count plot
+plt.figure(figsize=(10, 6))
+sns.countplot(x='day', hue='sex', data=tips, palette='pastel')
+plt.title('Count of Visits by Day and Gender')
+plt.show()
+
+# Bar plot
+plt.figure(figsize=(10, 6))
+sns.barplot(x='day', y='total_bill', hue='sex', data=tips, ci=95)
+plt.title('Average Bill by Day and Gender')
+plt.show()
+
+# Point plot
+plt.figure(figsize=(10, 6))
+sns.pointplot(x='day', y='total_bill', hue='sex', data=tips)
+plt.title('Point Plot')
+plt.show()
+
+# Categorical plot (catplot)
+g = sns.catplot(x='day', y='total_bill', hue='sex', col='time',
+                data=tips, kind='box', height=4, aspect=0.7)
+g.fig.suptitle('Categorical Plot with Facets', y=1.02)
+plt.show()
+
+# FacetGrid for custom plots
+g = sns.FacetGrid(tips, col='time', row='smoker', height=4)
+g.map(sns.histplot, 'total_bill', kde=True)
+g.add_legend()
+plt.show()
+
+# FacetGrid with different plot types
+g = sns.FacetGrid(tips, col='day', hue='sex', height=4)
+g.map(plt.scatter, 'total_bill', 'tip', alpha=0.5)
+g.add_legend()
+plt.show()
+
+# Relational plot
+sns.relplot(x='total_bill', y='tip', hue='day', size='size',
+            col='time', data=tips, height=5)
+plt.show()
+
+# Line plot
+plt.figure(figsize=(12, 6))
+sns.lineplot(x='year', y='passengers', hue='month', data=flights)
+plt.title('Flight Passengers Over Time')
+plt.xticks(rotation=45)
+plt.show()
+
+# Strip plot
+plt.figure(figsize=(10, 6))
+sns.stripplot(x='day', y='total_bill', data=tips, jitter=True, alpha=0.5)
+plt.title('Strip Plot')
+plt.show()
+
+# Custom color palettes
+custom_palette = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A']
+plt.figure(figsize=(10, 6))
+sns.barplot(x='day', y='total_bill', data=tips, palette=custom_palette)
+plt.show()
+
+# Set specific colors
+sns.set_palette(sns.color_palette("husl", 8))
+
+# Diverging palette
+plt.figure(figsize=(10, 6))
+sns.heatmap(correlation, cmap=sns.diverging_palette(250, 10, as_cmap=True),
+            center=0, annot=True)
+plt.show()
+
+# Customizing plots
+plt.figure(figsize=(10, 6))
+ax = sns.violinplot(x='day', y='total_bill', data=tips)
+ax.set_title('Customized Violin Plot', fontsize=16, fontweight='bold')
+ax.set_xlabel('Day of Week', fontsize=12)
+ax.set_ylabel('Total Bill ($)', fontsize=12)
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# Multiple plot types combined
+fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+
+sns.histplot(tips['total_bill'], kde=True, ax=axes[0, 0])
+axes[0, 0].set_title('Distribution')
+
+sns.boxplot(x='day', y='total_bill', data=tips, ax=axes[0, 1])
+axes[0, 1].set_title('Box Plot')
+
+sns.scatterplot(x='total_bill', y='tip', hue='time', data=tips, ax=axes[1, 0])
+axes[1, 0].set_title('Scatter Plot')
+
+sns.heatmap(tips.corr(), annot=True, ax=axes[1, 1])
+axes[1, 1].set_title('Correlation')
+
+plt.tight_layout()
+plt.show()
+```
+
+### Scikit-learn
+
+**Scikit-learn** is the most popular machine learning library in Python. It provides simple and efficient tools for data analysis and modeling, built on NumPy, SciPy, and Matplotlib.
+
+**Key Components**:
+
+**Preprocessing**:
+- **StandardScaler**: Standardize features (mean=0, std=1)
+- **MinMaxScaler**: Scale features to a range (typically 0-1)
+- **LabelEncoder**: Convert categorical labels to numbers
+- **OneHotEncoder**: Convert categorical variables to binary vectors
+
+**Model Selection**:
+- **train_test_split()**: Split data into training and testing sets
+- **cross_val_score()**: Evaluate model using cross-validation
+- **GridSearchCV**: Exhaustive search over parameter combinations
+- **RandomizedSearchCV**: Random search over parameter distributions
+
+**Supervised Learning**:
+
+**Classification** (predict categories):
+- **Logistic Regression**: Linear model for binary/multi-class classification
+- **Decision Trees**: Tree-based model that splits on features
+- **Random Forest**: Ensemble of decision trees
+- **SVM (Support Vector Machines)**: Find optimal separating hyperplane
+- **K-Nearest Neighbors**: Classify based on nearest training examples
+- **Naive Bayes**: Probabilistic classifier based on Bayes' theorem
+- **Gradient Boosting**: Iteratively improve weak learners
+
+**Regression** (predict continuous values):
+- **Linear Regression**: Fit linear relationship
+- **Ridge/Lasso**: Linear regression with regularization
+- **Decision Tree/Random Forest Regressor**: Tree-based regression
+- **SVR**: Support Vector Regression
+
+**Unsupervised Learning**:
+
+**Clustering** (group similar data):
+- **K-Means**: Partition data into K clusters
+- **DBSCAN**: Density-based clustering
+- **Hierarchical Clustering**: Create cluster hierarchy
+
+**Dimensionality Reduction**:
+- **PCA**: Reduce dimensions while preserving variance
+- **t-SNE**: Visualize high-dimensional data in 2D/3D
+
+**Model Evaluation**:
+- **Accuracy, Precision, Recall, F1-Score**: Classification metrics
+- **Confusion Matrix**: Visualize classification performance
+- **MSE, RMSE, R²**: Regression metrics
+- **ROC Curve, AUC**: Binary classification performance
+
+**Pipelines**: Chain preprocessing and modeling steps together for cleaner code and preventing data leakage.
+
+**Use Cases**: Predictive modeling, customer segmentation, fraud detection, recommendation systems, image classification, price prediction
+
+```python
+from sklearn.model_selection import (
+    train_test_split, cross_val_score, GridSearchCV, 
+    RandomizedSearchCV, cross_validate
+)
+from sklearn.preprocessing import (
+    StandardScaler, MinMaxScaler, LabelEncoder, 
+    OneHotEncoder, PolynomialFeatures
+)
+from sklearn.linear_model import (
+    LinearRegression, LogisticRegression, Ridge, Lasso, ElasticNet
+)
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.ensemble import (
+    RandomForestClassifier, RandomForestRegressor,
+    GradientBoostingClassifier, AdaBoostClassifier,
+    VotingClassifier, BaggingClassifier
+)
+from sklearn.svm import SVC, SVR
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
+from sklearn.decomposition import PCA
+from sklearn.metrics import (
+    accuracy_score, confusion_matrix, classification_report,
+    mean_squared_error, r2_score, mean_absolute_error,
+    precision_score, recall_score, f1_score, roc_auc_score,
+    roc_curve, silhouette_score
+)
+from sklearn.datasets import (
+    load_iris, load_digits, make_classification, make_regression
+)
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+import numpy as np
+import pandas as pd
+
+# Load dataset
+iris = load_iris()
+X, y = iris.data, iris.target
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Feature scaling
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# MinMax scaling
+minmax_scaler = MinMaxScaler()
+X_train_minmax = minmax_scaler.fit_transform(X_train)
+
+# Classification with Random Forest
+rf_classifier = RandomForestClassifier(
+    n_estimators=100,
+    max_depth=10,
+    random_state=42
+)
+rf_classifier.fit(X_train_scaled, y_train)
+y_pred = rf_classifier.predict(X_test_scaled)
+
+# Evaluation
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+class_report = classification_report(y_test, y_pred)
+
+print(f"Accuracy: {accuracy:.4f}")
+print(f"Confusion Matrix:\n{conf_matrix}")
+print(f"Classification Report:\n{class_report}")
+
+# Probability predictions
+y_pred_proba = rf_classifier.predict_proba(X_test_scaled)
+
+# Feature importance
+feature_importance = rf_classifier.feature_importances_
+for i, importance in enumerate(feature_importance):
+    print(f"Feature {i}: {importance:.4f}")
+
+# Cross-validation
+scores = cross_val_score(rf_classifier, X_train_scaled, y_train, cv=5)
+print(f"Cross-validation scores: {scores}")
+print(f"Mean CV score: {scores.mean():.3f} (+/- {scores.std():.3f})")
+
+# Cross-validate with multiple metrics
+cv_results = cross_validate(
+    rf_classifier,
+    X_train_scaled,
+    y_train,
+    cv=5,
+    scoring=['accuracy', 'precision_macro', 'recall_macro']
+)
+
+# Hyperparameter tuning with GridSearchCV
+param_grid = {
+    'n_estimators': [50, 100, 200],
+    'max_depth': [None, 10, 20, 30],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
+}
+
+grid_search = GridSearchCV(
+    RandomForestClassifier(random_state=42),
+    param_grid,
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1,
+    verbose=1
+)
+
+grid_search.fit(X_train_scaled, y_train)
+print(f"Best parameters: {grid_search.best_params_}")
+print(f"Best score: {grid_search.best_score_:.3f}")
+
+# Randomized search
+param_dist = {
+    'n_estimators': [50, 100, 150, 200, 250],
+    'max_depth': [None, 10, 20, 30, 40],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
+}
+
+random_search = RandomizedSearchCV(
+    RandomForestClassifier(random_state=42),
+    param_distributions=param_dist,
+    n_iter=20,
+    cv=5,
+    random_state=42,
+    n_jobs=-1
+)
+
+random_search.fit(X_train_scaled, y_train)
+
+# Linear Regression
+X_reg, y_reg = make_regression(n_samples=100, n_features=1, noise=10, random_state=42)
+
+X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(
+    X_reg, y_reg, test_size=0.2, random_state=42
+)
+
+lin_reg = LinearRegression()
+lin_reg.fit(X_train_reg, y_train_reg)
+y_pred_reg = lin_reg.predict(X_test_reg)
+
+# Regression metrics
+mse = mean_squared_error(y_test_reg, y_pred_reg)
+rmse = np.sqrt(mse)
+mae = mean_absolute_error(y_test_reg, y_pred_reg)
+r2 = r2_score(y_test_reg, y_pred_reg)
+
+print(f"MSE: {mse:.3f}")
+print(f"RMSE: {rmse:.3f}")
+print(f"MAE: {mae:.3f}")
+print(f"R² Score: {r2:.3f}")
+
+# Polynomial regression
+poly_features = PolynomialFeatures(degree=2)
+X_poly = poly_features.fit_transform(X_train_reg)
+
+poly_reg = LinearRegression()
+poly_reg.fit(X_poly, y_train_reg)
+
+# Ridge regression (L2 regularization)
+ridge = Ridge(alpha=1.0)
+ridge.fit(X_train_reg, y_train_reg)
+
+# Lasso regression (L1 regularization)
+lasso = Lasso(alpha=0.1)
+lasso.fit(X_train_reg, y_train_reg)
+
+# ElasticNet (L1 + L2)
+elastic_net = ElasticNet(alpha=0.1, l1_ratio=0.5)
+elastic_net.fit(X_train_reg, y_train_reg)
+
+# Logistic Regression
+log_reg = LogisticRegression(max_iter=1000)
+log_reg.fit(X_train_scaled, y_train)
+y_pred_log = log_reg.predict(X_test_scaled)
+
+# Decision Tree
+dt_classifier = DecisionTreeClassifier(
+    max_depth=5,
+    min_samples_split=10,
+    random_state=42
+)
+dt_classifier.fit(X_train_scaled, y_train)
+
+# SVM
+svm_classifier = SVC(kernel='rbf', C=1.0, gamma='auto', random_state=42)
+svm_classifier.fit(X_train_scaled, y_train)
+
+# K-Nearest Neighbors
+knn_classifier = KNeighborsClassifier(n_neighbors=5)
+knn_classifier.fit(X_train_scaled, y_train)
+
+# Naive Bayes
+nb_classifier = GaussianNB()
+nb_classifier.fit(X_train_scaled, y_train)
+
+# Ensemble - Voting Classifier
+voting_clf = VotingClassifier(
+    estimators=[
+        ('rf', rf_classifier),
+        ('svm', svm_classifier),
+        ('knn', knn_classifier)
+    ],
+    voting='hard'
+)
+voting_clf.fit(X_train_scaled, y_train)
+
+# Gradient Boosting
+gb_classifier = GradientBoostingClassifier(
+    n_estimators=100,
+    learning_rate=0.1,
+    max_depth=3,
+    random_state=42
+)
+gb_classifier.fit(X_train_scaled, y_train)
+
+# AdaBoost
+ada_classifier = AdaBoostClassifier(
+    n_estimators=50,
+    learning_rate=1.0,
+    random_state=42
+)
+ada_classifier.fit(X_train_scaled, y_train)
+
+# Clustering - KMeans
+kmeans = KMeans(n_clusters=3, random_state=42)
+clusters = kmeans.fit_predict(X)
+
+# Evaluate clustering
+silhouette = silhouette_score(X, clusters)
+print(f"Silhouette Score: {silhouette:.3f}")
+
+# DBSCAN
+dbscan = DBSCAN(eps=0.5, min_samples=5)
+dbscan_clusters = dbscan.fit_predict(X)
+
+# Hierarchical clustering
+hierarchical = AgglomerativeClustering(n_clusters=3)
+hierarchical_clusters = hierarchical.fit_predict(X)
+
+# PCA for dimensionality reduction
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_train_scaled)
+
+print(f"Explained variance ratio: {pca.explained_variance_ratio_}")
+print(f"Total variance explained: {sum(pca.explained_variance_ratio_):.3f}")
+
+# Pipeline
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('pca', PCA(n_components=2)),
+    ('classifier', RandomForestClassifier(random_state=42))
+])
+
+pipeline.fit(X_train, y_train)
+y_pred_pipeline = pipeline.predict(X_test)
+
+# Column Transformer for mixed data types
+numeric_features = [0, 1, 2]
+categorical_features = [3]
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), numeric_features),
+        ('cat', OneHotEncoder(), categorical_features)
+    ]
+)
+
+# Full pipeline with preprocessing
+full_pipeline = Pipeline([
+    ('preprocessor', preprocessor),
+    ('classifier', RandomForestClassifier(random_state=42))
+])
+
+# ROC curve
+from sklearn.metrics import roc_curve, auc
+
+y_pred_proba = rf_classifier.predict_proba(X_test_scaled)[:, 1]
+# For binary classification only
+# fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+# roc_auc = auc(fpr, tpr)
+
+# Save model
+import joblib
+joblib.dump(rf_classifier, 'model.pkl')
+loaded_model = joblib.load('model.pkl')
+
+# Pickle alternative
+import pickle
+with open('model.pkl', 'wb') as f:
+    pickle.dump(rf_classifier, f)
+
+with open('model.pkl', 'rb') as f:
+    loaded_model = pickle.load(f)
+```
+
+## Deep Learning Libraries
+
+### TensorFlow and Keras
+
+**TensorFlow** is an end-to-end open-source platform for machine learning developed by Google. **Keras** is a high-level neural networks API that runs on top of TensorFlow, making deep learning more accessible.
+
+**Key Concepts**:
+
+**Tensors**: Multi-dimensional arrays (generalization of matrices) that flow through the network - hence "TensorFlow".
+
+**Neural Networks**: Computing systems inspired by biological neural networks, consisting of interconnected nodes (neurons) organized in layers.
+
+**Layers**: Building blocks of neural networks:
+- **Dense (Fully Connected)**: Every neuron connects to every neuron in next layer
+- **Convolutional (Conv2D)**: Extract spatial features from images
+- **Pooling**: Reduce spatial dimensions (MaxPooling, AveragePooling)
+- **Dropout**: Randomly deactivate neurons to prevent overfitting
+- **Recurrent (LSTM, GRU)**: Process sequential data
+- **Embedding**: Convert categorical data to dense vectors
+
+**Model Building Approaches**:
+- **Sequential API**: Stack layers linearly (simplest)
+- **Functional API**: Create complex architectures with multiple inputs/outputs
+- **Subclassing**: Maximum flexibility for custom models
+
+**Training Process**:
+1. **Compile**: Specify optimizer, loss function, metrics
+2. **Fit**: Train the model on data
+3. **Evaluate**: Test model performance
+4. **Predict**: Make predictions on new data
+
+**Optimizers**: Algorithms that update model weights:
+- Adam, SGD, RMSprop, Adagrad
+
+**Loss Functions**: Measure how wrong predictions are:
+- Binary/Categorical Crossentropy (classification)
+- MSE, MAE (regression)
+
+**Callbacks**: Functions called during training:
+- **EarlyStopping**: Stop when performance stops improving
+- **ModelCheckpoint**: Save best model during training
+- **TensorBoard**: Visualize training progress
+
+**Transfer Learning**: Use pre-trained models (VGG, ResNet, Inception) and adapt them to your task.
+
+**Use Cases**: Image classification, object detection, natural language processing, time series prediction, generative models
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers, models
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+import numpy as np
+
+# Check TensorFlow version
+print(f"TensorFlow version: {tf.__version__}")
+
+# Load dataset
+(X_train, y_train), (X_test, y_test) = keras.datasets.mnist.load_data()
+
+# Normalize data
+X_train = X_train.astype('float32') / 255.0
+X_test = X_test.astype('float32') / 255.0
+
+# Reshape for CNN
+X_train = X_train.reshape(-1, 28, 28, 1)
+X_test = X_test.reshape(-1, 28, 28, 1)
+
+# Sequential model
+model = models.Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.Flatten(),
+    layers.Dense(64, activation='relu'),
+    layers.Dropout(0.5),
+    layers.Dense(10, activation='softmax')
+])
+
+# Compile model
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Model summary
+model.summary()
+
+# Callbacks
+early_stopping = EarlyStopping(
+    monitor='val_loss',
+    patience=3,
+    restore_best_weights=True
+)
+
+checkpoint = ModelCheckpoint(
+    'best_model.h5',
+    monitor='val_accuracy',
+    save_best_only=True
+)
+
+# Train model
+history = model.fit(
+    X_train, y_train,
+    epochs=10,
+    batch_size=128,
+    validation_split=0.2,
+    callbacks=[early_stopping, checkpoint],
+    verbose=1
+)
+
+# Evaluate
+test_loss, test_accuracy = model.evaluate(X_test, y_test)
+print(f"Test accuracy: {test_accuracy:.4f}")
+
+# Make predictions
+predictions = model.predict(X_test[:5])
+predicted_classes = np.argmax(predictions, axis=1)
+
+# Functional API
+inputs = keras.Input(shape=(28, 28, 1))
+x = layers.Conv2D(32, (3, 3), activation='relu')(inputs)
+x = layers.MaxPooling2D((2, 2))(x)
+x = layers.Conv2D(64, (3, 3), activation='relu')(x)
+x = layers.Flatten()(x)
+x = layers.Dense(64, activation='relu')(x)
+outputs = layers.Dense(10, activation='softmax')(x)
+
+functional_model = keras.Model(inputs=inputs, outputs=outputs)
+
+# Custom layers
+class CustomLayer(layers.Layer):
+    def __init__(self, units=32):
+        super(CustomLayer, self).__init__()
+        self.units = units
+    
+    def build(self, input_shape):
+        self.w = self.add_weight(
+            shape=(input_shape[-1], self.units),
+            initializer='random_normal',
+            trainable=True
+        )
+        self.b = self.add_weight(
+            shape=(self.units,),
+            initializer='zeros',
+            trainable=True
+        )
+    
+    def call(self, inputs):
+        return tf.matmul(inputs, self.w) + self.b
+
+# Custom training loop
+optimizer = keras.optimizers.Adam()
+loss_fn = keras.losses.SparseCategoricalCrossentropy()
+
+@tf.function
+def train_step(x, y):
+    with tf.GradientTape() as tape:
+        predictions = model(x, training=True)
+        loss = loss_fn(y, predictions)
+    gradients = tape.gradient(loss, model.trainable_variables)
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+    return loss
+
+# Data augmentation
+datagen = ImageDataGenerator(
+    rotation_range=20,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=True,
+    zoom_range=0.2
+)
+
+# Transfer learning
+base_model = keras.applications.VGG16(
+    weights='imagenet',
+    include_top=False,
+    input_shape=(224, 224, 3)
+)
+
+base_model.trainable = False
+
+transfer_model = models.Sequential([
+    base_model,
+    layers.GlobalAveragePooling2D(),
+    layers.Dense(256, activation='relu'),
+    layers.Dropout(0.5),
+    layers.Dense(10, activation='softmax')
+])
+
+# Save and load model
+model.save('my_model.h5')
+loaded_model = keras.models.load_model('my_model.h5')
+
+# Save weights only
+model.save_weights('model_weights.h5')
+model.load_weights('model_weights.h5')
+
+# TensorBoard callback
+tensorboard_callback = keras.callbacks.TensorBoard(
+    log_dir='./logs',
+    histogram_freq=1
+)
+```
+
+### PyTorch
+
+**PyTorch** is an open-source deep learning framework developed by Facebook/Meta. It's known for its flexibility, dynamic computation graphs, and Pythonic approach, making it popular in research.
+
+**Key Differences from TensorFlow**:
+- **Dynamic Computation Graph**: Build graphs on-the-fly (eager execution)
+- **More Pythonic**: Feels more like native Python
+- **Easier Debugging**: Standard Python debugging tools work
+- **Research-Friendly**: Preferred in academic settings
+
+**Core Concepts**:
+
+**Tensors**: Similar to NumPy arrays but can run on GPUs for faster computation. Support automatic differentiation.
+
+**Autograd**: Automatic differentiation system that computes gradients automatically during backpropagation.
+
+**nn.Module**: Base class for all neural network modules. You inherit from this to create custom models.
+
+**Model Architecture**:
+```
+Define model → Define loss → Define optimizer → Training loop
+```
+
+**Common Layers**:
+- **nn.Linear**: Fully connected layer
+- **nn.Conv2d**: 2D convolutional layer
+- **nn.MaxPool2d**: Max pooling
+- **nn.ReLU, nn.Sigmoid**: Activation functions
+- **nn.LSTM, nn.GRU**: Recurrent layers
+- **nn.Dropout**: Regularization
+- **nn.BatchNorm2d**: Batch normalization
+
+**DataLoader**: Efficiently load data in batches with multiprocessing support.
+
+**Custom Training Loop**: Unlike Keras, you write the training loop explicitly:
+1. Forward pass: Get predictions
+2. Calculate loss
+3. Backward pass: Compute gradients with `loss.backward()`
+4. Update weights: `optimizer.step()`
+
+**GPU Support**: Easy device management with `.to(device)` or `.cuda()`.
+
+**Saving Models**:
+- **state_dict**: Save just the parameters (recommended)
+- **Entire model**: Save architecture and parameters
+
+**TorchVision**: Computer vision utilities including pre-trained models and data augmentation.
+
+**Use Cases**: Research, computer vision, NLP, reinforcement learning, GANs, custom architectures
+
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader, TensorDataset
+import torchvision
+import torchvision.transforms as transforms
+import numpy as np
+
+# Check PyTorch version
+print(f"PyTorch version: {torch.__version__}")
+print(f"CUDA available: {torch.cuda.is_available()}")
+
+# Device configuration
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# Create tensors
+x = torch.tensor([1, 2, 3, 4, 5])
+y = torch.zeros(3, 4)
+z = torch.randn(2, 3)
+ones = torch.ones(3, 3)
+
+# Tensor operations
+a = torch.tensor([1.0, 2.0, 3.0])
+b = torch.tensor([4.0, 5.0, 6.0])
+
+add = a + b
+mul = a * b
+dot = torch.dot(a, b)
+
+# Reshaping
+x = torch.randn(2, 3, 4)
+reshaped = x.view(6, 4)
+reshaped2 = x.reshape(3, 8)
+
+# Define neural network
+class NeuralNetwork(nn.Module):
+    def __init__(self, input_size, hidden_size, num_classes):
+        super(NeuralNetwork, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, num_classes)
+    
+    def forward(self, x):
+        out = self.fc1(x)
+        out = self.relu(out)
+        out = self.fc2(out)
+        return out
+
+# Create model
+input_size = 784
+hidden_size = 128
+num_classes = 10
+
+model = NeuralNetwork(input_size, hidden_size, num_classes).to(device)
+
+# Loss and optimizer
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+# CNN model
+class CNN(nn.Module):
+    def __init__(self):
+        super(CNN, self).__init__()
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.fc1 = nn.Linear(64 * 5 * 5, 128)
+        self.fc2 = nn.Linear(128, 10)
+        self.dropout = nn.Dropout(0.5)
+    
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = x.view(-1, 64 * 5 * 5)
+        x = F.relu(self.fc1(x))
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
+
+cnn_model = CNN().to(device)
+
+# Load MNIST dataset
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,), (0.5,))
+])
+
+train_dataset = torchvision.datasets.MNIST(
+    root='./data',
+    train=True,
+    transform=transform,
+    download=True
+)
+
+test_dataset = torchvision.datasets.MNIST(
+    root='./data',
+    train=False,
+    transform=transform
+)
+
+train_loader = DataLoader(
+    dataset=train_dataset,
+    batch_size=128,
+    shuffle=True
+)
+
+test_loader = DataLoader(
+    dataset=test_dataset,
+    batch_size=128,
+    shuffle=False
+)
+
+# Training loop
+num_epochs = 5
+
+for epoch in range(num_epochs):
+    model.train()
+    for batch_idx, (data, targets) in enumerate(train_loader):
+        data = data.reshape(-1, 784).to(device)
+        targets = targets.to(device)
+        
+        # Forward pass
+        outputs = model(data)
+        loss = criterion(outputs, targets)
+        
+        # Backward pass
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+        if (batch_idx + 1) % 100 == 0:
+            print(f'Epoch [{epoch+1}/{num_epochs}], Step [{batch_idx+1}/{len(train_loader)}], Loss: {loss.item():.4f}')
+
+# Evaluation
+model.eval()
+with torch.no_grad():
+    correct = 0
+    total = 0
+    for data, targets in test_loader:
+        data = data.reshape(-1, 784).to(device)
+        targets = targets.to(device)
+        outputs = model(data)
+        _, predicted = torch.max(outputs.data, 1)
+        total += targets.size(0)
+        correct += (predicted == targets).sum().item()
+    
+    accuracy = 100 * correct / total
+    print(f'Test Accuracy: {accuracy:.2f}%')
+
+# Custom dataset
+class CustomDataset(Dataset):
+    def __init__(self, data, labels):
+        self.data = data
+        self.labels = labels
+    
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, idx):
+        return self.data[idx], self.labels[idx]
+
+# RNN/LSTM
+class RNN(nn.Module):
+    def __init__(self, input_size, hidden_size, num_layers, num_classes):
+        super(RNN, self).__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_size, num_classes)
+    
+    def forward(self, x):
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device)
+        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device)
+        
+        out, _ = self.lstm(x, (h0, c0))
+        out = self.fc(out[:, -1, :])
+        return out
+
+# Save and load model
+torch.save(model.state_dict(), 'model.pth')
+model.load_state_dict(torch.load('model.pth'))
+
+# Save entire model
+torch.save(model, 'entire_model.pth')
+loaded_model = torch.load('entire_model.pth')
+
+# Transfer learning
+resnet = torchvision.models.resnet18(pretrained=True)
+for param in resnet.parameters():
+    param.requires_grad = False
+
+num_features = resnet.fc.in_features
+resnet.fc = nn.Linear(num_features, 10)
+
+# Learning rate scheduler
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
+
+# Gradient clipping
+torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+```

@@ -1,0 +1,345 @@
+---
+title: Advance Python Complete Guide
+description: A comprehensive guide to advanced Python programming concepts, including asynchronous programming, multithreading, multiprocessing, and regular expressions.
+slug: generative-ai/advanced-python
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+### Asyncio (Asynchronous Programming)
+
+**Asynchronous Programming** allows your program to handle multiple operations concurrently without using multiple threads. It's particularly useful for I/O-bound operations like network requests, file operations, or database queries.
+
+**Key Concepts**:
+
+**Coroutine**: A function defined with `async def` that can be paused and resumed. It's like a special function that can "yield" control back to the event loop.
+
+**Event Loop**: The core of asyncio that manages and executes asynchronous tasks. It runs one task at a time but switches between tasks when they're waiting.
+
+**await**: Keyword used to pause coroutine execution until the awaited operation completes. You can only use `await` inside `async` functions.
+
+**Task**: A wrapper around a coroutine that allows it to run concurrently with other tasks.
+
+**Why Use Asyncio?**
+- **I/O Efficiency**: Don't block while waiting for network/disk operations
+- **Concurrency**: Handle thousands of connections with minimal resources
+- **Single-threaded**: Avoid threading complexity and race conditions
+
+**Common Patterns**:
+- **asyncio.gather()**: Run multiple coroutines concurrently and wait for all to complete
+- **asyncio.create_task()**: Schedule a coroutine to run concurrently
+- **asyncio.wait_for()**: Add timeout to async operations
+- **Async context managers**: Resources that need async setup/cleanup
+- **Async generators**: Produce values asynchronously
+
+**Best Use Cases**: Web scraping, API calls, web servers, chat applications, real-time data processing
+
+**Not Good For**: CPU-intensive tasks (use multiprocessing instead)
+
+```python
+import asyncio
+import aiohttp
+import time
+
+# Basic async function
+async def say_hello():
+    print("Hello")
+    await asyncio.sleep(1)
+    print("World")
+
+# Run async function
+asyncio.run(say_hello())
+
+# Multiple coroutines
+async def fetch_data(id):
+    print(f"Fetching data {id}")
+    await asyncio.sleep(2)
+    return f"Data {id}"
+
+async def main():
+    # Run sequentially
+    result1 = await fetch_data(1)
+    result2 = await fetch_data(2)
+    print(result1, result2)
+
+asyncio.run(main())
+
+# Run concurrently
+async def main_concurrent():
+    results = await asyncio.gather(
+        fetch_data(1),
+        fetch_data(2),
+        fetch_data(3)
+    )
+    print(results)
+
+asyncio.run(main_concurrent())
+
+# Async with timeout
+async def fetch_with_timeout():
+    try:
+        result = await asyncio.wait_for(fetch_data(1), timeout=1.0)
+        return result
+    except asyncio.TimeoutError:
+        print("Timeout!")
+
+# Async HTTP requests
+async def fetch_url(session, url):
+    async with session.get(url) as response:
+        return await response.text()
+
+async def fetch_multiple_urls():
+    urls = [
+        'https://api.github.com/users/github',
+        'https://api.github.com/users/google',
+        'https://api.github.com/users/microsoft'
+    ]
+    
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_url(session, url) for url in urls]
+        results = await asyncio.gather(*tasks)
+        return results
+
+# Async context managers
+class AsyncResource:
+    async def __aenter__(self):
+        print("Acquiring resource")
+        await asyncio.sleep(1)
+        return self
+    
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        print("Releasing resource")
+        await asyncio.sleep(1)
+
+async def use_resource():
+    async with AsyncResource() as resource:
+        print("Using resource")
+
+# Async generators
+async def async_generator():
+    for i in range(5):
+        await asyncio.sleep(0.5)
+        yield i
+
+async def consume_generator():
+    async for value in async_generator():
+        print(value)
+
+# Create tasks
+async def main_with_tasks():
+    task1 = asyncio.create_task(fetch_data(1))
+    task2 = asyncio.create_task(fetch_data(2))
+    
+    result1 = await task1
+    result2 = await task2
+    print(result1, result2)
+
+# Event loop operations
+loop = asyncio.get_event_loop()
+# loop.run_until_complete(main())
+loop.close()
+```
+
+### Multithreading and Multiprocessing
+
+**Concurrency** is about dealing with multiple things at once. Python offers two main approaches: threading and multiprocessing.
+
+**Threading (Multithreading)**:
+
+**What is it?** Multiple threads run within a single process, sharing the same memory space.
+
+**When to Use**:
+- I/O-bound tasks (file operations, network requests, database queries)
+- Tasks that spend time waiting
+- GUI applications that need responsiveness
+
+**Limitations**:
+- **GIL (Global Interpreter Lock)**: Python's GIL allows only one thread to execute Python code at a time, making threading ineffective for CPU-bound tasks
+- Shared memory can lead to race conditions (use locks)
+
+**Key Components**:
+- **Thread**: Individual execution unit
+- **Lock**: Prevent multiple threads from accessing shared data simultaneously
+- **ThreadPoolExecutor**: Manage a pool of threads easily
+
+**Multiprocessing**:
+
+**What is it?** Multiple processes run independently, each with its own Python interpreter and memory space.
+
+**When to Use**:
+- CPU-bound tasks (heavy computations, data processing)
+- Tasks that need true parallelism
+- When you want to bypass the GIL
+
+**Benefits**:
+- True parallel execution on multiple CPU cores
+- No GIL limitations
+- Crash in one process doesn't affect others
+
+**Drawbacks**:
+- Higher memory overhead (separate memory for each process)
+- More complex inter-process communication
+- Slower to start than threads
+
+**Key Components**:
+- **Process**: Independent execution unit
+- **Pool**: Manage multiple worker processes
+- **Queue**: Share data between processes
+- **ProcessPoolExecutor**: High-level interface for process pools
+
+**General Rule**:
+- **I/O-bound** → Use Threading or Asyncio
+- **CPU-bound** → Use Multiprocessing
+
+```python
+import threading
+import multiprocessing
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+import time
+
+# Threading
+def worker(name, duration):
+    print(f"Worker {name} starting")
+    time.sleep(duration)
+    print(f"Worker {name} finished")
+    return f"Result from {name}"
+
+# Create threads
+thread1 = threading.Thread(target=worker, args=("A", 2))
+thread2 = threading.Thread(target=worker, args=("B", 1))
+
+thread1.start()
+thread2.start()
+
+thread1.join()
+thread2.join()
+
+# Thread with lock
+lock = threading.Lock()
+counter = 0
+
+def increment():
+    global counter
+    for _ in range(100000):
+        with lock:
+            counter += 1
+
+threads = [threading.Thread(target=increment) for _ in range(10)]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+
+print(f"Counter: {counter}")
+
+# Thread pool executor
+def task(n):
+    time.sleep(1)
+    return n * n
+
+with ThreadPoolExecutor(max_workers=5) as executor:
+    futures = [executor.submit(task, i) for i in range(10)]
+    results = [f.result() for f in futures]
+    print(results)
+
+# Map with thread pool
+with ThreadPoolExecutor(max_workers=5) as executor:
+    results = list(executor.map(task, range(10)))
+
+# Multiprocessing
+def cpu_intensive_task(n):
+    return sum(i * i for i in range(n))
+
+if __name__ == '__main__':
+    # Create processes
+    process1 = multiprocessing.Process(target=worker, args=("P1", 2))
+    process2 = multiprocessing.Process(target=worker, args=("P2", 1))
+    
+    process1.start()
+    process2.start()
+    
+    process1.join()
+    process2.join()
+    
+    # Process pool
+    with multiprocessing.Pool(processes=4) as pool:
+        results = pool.map(cpu_intensive_task, [1000000, 2000000, 3000000, 4000000])
+        print(results)
+    
+    # Process pool executor
+    with ProcessPoolExecutor(max_workers=4) as executor:
+        results = list(executor.map(cpu_intensive_task, [1000000] * 4))
+
+# Queue for inter-process communication
+def producer(queue):
+    for i in range(5):
+        queue.put(i)
+        print(f"Produced: {i}")
+        time.sleep(0.5)
+
+def consumer(queue):
+    while True:
+        item = queue.get()
+        if item is None:
+            break
+        print(f"Consumed: {item}")
+
+if __name__ == '__main__':
+    queue = multiprocessing.Queue()
+    
+    prod = multiprocessing.Process(target=producer, args=(queue,))
+    cons = multiprocessing.Process(target=consumer, args=(queue,))
+    
+    prod.start()
+    cons.start()
+    
+    prod.join()
+    queue.put(None)
+    cons.join()
+```
+
+### Regular Expressions
+
+**Regular Expressions (Regex)** are powerful patterns used for matching and manipulating text. They provide a concise way to search, match, and manipulate strings based on patterns.
+
+**Why Use Regex?**
+- Validate input formats (email, phone numbers, URLs)
+- Search and extract specific patterns from text
+- Replace or clean text data
+- Parse structured text
+
+**Common Metacharacters**:
+- `.` : Any character except newline
+- `^` : Start of string
+- `$` : End of string
+- `*` : 0 or more repetitions
+- `+` : 1 or more repetitions
+- `?` : 0 or 1 repetition
+- `[]` : Character class (e.g., `[a-z]` matches any lowercase letter)
+- `|` : Alternation (e.g., `cat|dog` matches "cat" or "dog")
+- `()` : Grouping (e.g., `(abc)+` matches one or more occurrences of "abc")
+
+
+## Conclusion
+
+<Callout type="success">
+This comprehensive guide covers Python fundamentals, Generative AI libraries, data science tools, deep learning frameworks, and advanced concepts. Use this as a reference for your Python development journey!
+</Callout>
+
+### Next Steps
+
+1. Practice with real-world projects
+2. Explore specialized libraries for your domain
+3. Contribute to open-source projects
+4. Stay updated with Python community and PEPs
+5. Build a portfolio of Python applications
+
+### Resources
+
+- [Python Official Documentation](https://docs.python.org/)
+- [Real Python Tutorials](https://realpython.com/)
+- [PyPI - Python Package Index](https://pypi.org/)
+- [Python Enhancement Proposals (PEPs)](https://peps.python.org/)
+- [Awesome Python](https://github.com/vinta/awesome-python)
